@@ -67,10 +67,9 @@ Compute the embedding of each `combined`.
   {
     "sentence": "this is the sentence.",
     "combined": "this is the sentence. this is the next sentence.",
-    "embedding": [0.002, 0.003, 0.004, ...], // embedding of the combined key text
+    "embedding": [0.002, 0.003, 0.004],
     "index": 0
-  },
-  // ...
+  }
 ]
 ----
 
