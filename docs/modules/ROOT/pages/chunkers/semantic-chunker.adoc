@@ -99,6 +99,10 @@ Split the text into chunks at the identified breakpoints.
 * Better for RAG applications
 * Reduces information loss
 
+== Disadvantages
+
+* Needs an embedding model (thus the system needs to be able to handle it so performance issues are not faced)
+
 == Requirements
 
 * ONNX Runtime for embedding generation
