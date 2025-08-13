@@ -2,37 +2,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.PabloSanchi</groupId>
+        <groupId>io.jchunk</groupId>
         <artifactId>jchunk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
-
+    
     <artifactId>jchunk-fixed</artifactId>
     <packaging>jar</packaging>
+    
     <name>JChunk - Fixed Chunker</name>
     <description>Fixed Chunker for Java</description>
-    <url>https://github.com/PabloSanchi/jchunk</url>
-
-    <scm>
-        <connection>scm:git:git://github.com/PabloSanchi/jchunk.git</connection>
-        <developerConnection>scm:git:git@github.com:PabloSanchi/jchunk.git</developerConnection>
-        <url>https://github.com/PabloSanchi/jchunk</url>
-        <tag>v0.0.0</tag>
-    </scm>
-
+    
     <dependencies>
         <dependency>
-            <groupId>com.github.PabloSanchi</groupId>
+            <groupId>io.jchunk</groupId>
             <artifactId>jchunk-core</artifactId>
-            <version>${project.parent.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.github.PabloSanchi</groupId>
+            <groupId>io.jchunk</groupId>
             <artifactId>commons</artifactId>
-            <version>${project.parent.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
+        
         <!-- test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -47,5 +39,5 @@
             <artifactId>mockito-core</artifactId>
         </dependency>
     </dependencies>
-
+    
 </project>

@@ -2,37 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.PabloSanchi</groupId>
+        <groupId>io.jchunk</groupId>
         <artifactId>jchunk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    
     <artifactId>jchunk-semantic</artifactId>
     <packaging>jar</packaging>
     <name>JChunk - Semantic Chunker</name>
     <description>Semantic Chunker for Java</description>
-    <url>https://github.com/PabloSanchi/jchunk</url>
-
+    <url>https://github.com/jchunk-io/jchunk</url>
+    
     <scm>
-        <connection>scm:git:git://github.com/PabloSanchi/jchunk.git</connection>
-        <developerConnection>scm:git:git@github.com:PabloSanchi/jchunk.git</developerConnection>
-        <url>https://github.com/PabloSanchi/jchunk</url>
+        <connection>scm:git:git://github.com/jchunk-io/jchunk.git</connection>
+        <developerConnection>scm:git:git@github.com:jchunk-io/jchunk.git</developerConnection>
         <tag>v0.0.0</tag>
+        <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
-
+    
     <properties>
         <onnxruntime.version>1.22.0</onnxruntime.version>
         <djl.version>0.34.0</djl.version>
     </properties>
-
+    
     <dependencies>
         <dependency>
-            <groupId>com.github.PabloSanchi</groupId>
+            <groupId>io.jchunk</groupId>
             <artifactId>jchunk-core</artifactId>
-            <version>${project.parent.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
+        
         <!-- ONNX related -->
         <dependency>
             <groupId>com.microsoft.onnxruntime</groupId>
@@ -49,7 +49,7 @@
             <artifactId>tokenizers</artifactId>
             <version>${djl.version}</version>
         </dependency>
-
+        
         <!-- test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -69,7 +69,7 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-
+        
     </dependencies>
-
+    
 </project>
