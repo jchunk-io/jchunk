@@ -7,13 +7,6 @@
 
 JChunk project is simple library that enables different types of text splitting strategies, essential for RAG applications.
 
-## ⚠️ WARNING - EARLY PHASE ⚠️
-
-For now there is only [Pablo Sanchidrian](https://github.com/PabloSanchi) developing this project (in free time) so it might take a while to get to a first stable version.
-
-Feel free to contribute!!
-
-
 ## Docs
 
 [Click here to see documentation](docs/modules/ROOT/pages/index.adoc)
