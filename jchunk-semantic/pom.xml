@@ -23,7 +23,7 @@
 
     <properties>
         <onnxruntime.version>1.22.0</onnxruntime.version>
-        <djl.version>0.33.0</djl.version>
+        <djl.version>0.34.0</djl.version>
     </properties>
 
     <dependencies>
