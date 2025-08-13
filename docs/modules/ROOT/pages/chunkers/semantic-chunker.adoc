@@ -85,7 +85,7 @@ Analyze the distances to identify sections where distances are smaller (indicati
 
 Use the 95th percentile of the distances as the threshold for determining breakpoints (can use any other percentile or threshold technique).
 
-image::semantic-chunk.png
+image::semantic-chunk.png[]
 
 
 === Splitting Chunks:
