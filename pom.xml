@@ -65,7 +65,7 @@
 		<palantir-format.version>2.39.0</palantir-format.version>
 		<surefire.version>3.5.3</surefire.version>
 		<maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
-		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-release-plugin.version>3.0.0-M5</maven-release-plugin.version>
 		<jacoco.version>0.8.12</jacoco.version>
 		<scm.version>2.1.0</scm.version>
