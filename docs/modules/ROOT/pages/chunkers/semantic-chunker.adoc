@@ -87,6 +87,8 @@ Use the 95th percentile of the distances as the threshold for determining breakp
 
 image::semantic-chunk.png[]
 
+NOTE: Image taken from this https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb[post]
+
 
 === Splitting Chunks:
 
@@ -108,3 +110,7 @@ Split the text into chunks at the identified breakpoints.
 * ONNX Runtime for embedding generation
 * Pre-trained embedding model (included in the module)
 * By default `all-minilm-l6-v2` is used
+
+== Acknowledgments
+
+This module is inspired by Greg Kamradt's post https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb[text splitting ideas]
