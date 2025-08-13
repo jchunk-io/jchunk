@@ -1,0 +1,38 @@
+= Getting Started
+:page-layout: article
+
+== Prerequisites
+
+* Java 21+
+* Maven 3.6+
+
+== Installation
+
+Add the JChunk dependency to your `pom.xml`:
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-fixed</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+----
+
+== Basic Usage
+
+[source,java]
+----
+FixedChunker chunker = new FixedChunker();
+
+String text = "Your long text here...";
+List<Chunk> chunks = chunker.chunk(text);
+
+System.out.println(chunks);
+----
+
+== Available Modules
+
+* `jchunk-fixed` - Fixed character chunking
+* `jchunk-recursive-character` - Recursive character chunking
+* `jchunk-semantic` - Semantic chunking with embeddings

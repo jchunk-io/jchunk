@@ -1,0 +1,64 @@
+= Contributing to JChunk
+:page-layout: article
+
+== Getting Started
+
+We welcome contributions to JChunk! This guide will help you get started.
+
+== Development Setup
+
+1. **Fork the repository**
+2. **Clone your fork**
+[source,bash]
+----
+git clone https://github.com/your-username/jchunk.git
+cd jchunk
+----
+3. **Build the project**
+[source,bash]
+----
+./mvnw clean install
+----
+
+== Code Style
+
+We use Spotless for code formatting:
+
+[source,bash]
+----
+./mvnw spotless:apply
+----
+
+== Testing
+
+All contributions must include tests and make sure to run:
+
+[source,bash]
+----
+./mvnw clean verify
+----
+
+== Pull Request Process
+
+1. Create a feature branch
+2. Make your changes
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Update documentation if needed
+6. Submit a pull request
+
+== Documentation
+
+When adding new features, please update the documentation:
+
+* Update relevant `.adoc` files in `docs/modules/ROOT/pages/`
+* Add examples and usage instructions
+* Update the navigation if needed
+
+== Code of Conduct
+
+Please read our link:../CODE_OF_CONDUCT.md[Code of Conduct] before contributing.
+
+== Questions?
+
+If you have questions, please open an issue on GitHub. 

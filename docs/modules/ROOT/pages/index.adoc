@@ -1,0 +1,45 @@
+= JChunk Documentation
+:page-layout: home
+:!sectids:
+
+[.lead]
+A Java Library for Text Chunking
+
+JChunk is a lightweight and flexible library designed to provide multiple strategies for text chunking within Java applications.
+
+== Quick Start
+
+[source,java]
+----
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+----
+
+[source,java]
+----
+// Basic usage
+FixedChunker chunker = new FixedChunker();
+List<Chunk> chunks = chunker.split("Your text here");
+----
+
+== Available Chunkers
+
+* xref:chunkers/fixed-chunker.adoc[Fixed Character Chunker] - Basic character-based splitting
+* xref:chunkers/recursive-chunker.adoc[Recursive Character Chunker] - Intelligent text splitting
+* xref:chunkers/semantic-chunker.adoc[Semantic Chunker] - AI-powered semantic splitting
+
+== Roadmap
+
+- [x] Fixed Character Chunker (DONE)
+- [x] Recursive Character Text Chunker (DONE)
+- [x] Semantic Chunker (DONE)
+- [ ] Agentic Chunker (FUTURE)
+
+== Contributing
+
+We welcome contributions!
+
+Please see our xref:contributing.adoc[Contributing Guide] for details.
