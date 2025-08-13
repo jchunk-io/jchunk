@@ -5,8 +5,7 @@
 
 ## A Java Library for Text Chunking
 
-JChunk project is simple library that enables different types of text splitting strategies.
-This project begun thanks to Greg Kamradt's post [text splitting ideas](https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb)
+JChunk project is simple library that enables different types of text splitting strategies, essential for RAG applications.
 
 ## ⚠️ WARNING - EARLY PHASE ⚠️
 
