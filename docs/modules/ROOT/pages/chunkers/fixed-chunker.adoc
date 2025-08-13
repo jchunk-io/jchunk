@@ -1,0 +1,75 @@
+= Fixed Character Chunker
+:page-layout: article
+
+== Overview
+
+The Fixed Character Chunker is a basic text processing technique where text is divided into fixed-size chunks of characters. While simple, it serves as an excellent starting point to understand text splitting fundamentals.
+
+== Configuration
+
+[source,java]
+----
+// using default config
+FixedChunker chunker = new FixedChunker();
+
+// with custom config
+Config config = Config.builder()
+        .chunkSize(10)
+        .chunkOverlap(0)
+        .delimiter(";")
+        .trimWhitespace(true)
+        .keepDelimter(Delimiter.START)
+        .build();
+
+FixedChunker chunker = new FixedChunker(config);
+----
+
+== Examples
+
+=== Basic Chunking
+
+Chunk size of 10 and no overlap (0)
+
+[source,java]
+----
+Config config = Config.builder()
+        .chunkSize(10)
+        .chunkOverlap(0)
+        .build();
+FixedChunker chunker = new FixedChunker(config);
+String text = "This is an example of character splitting.";
+
+List<Chunk> chunks = chunker.split(text);
+
+// Result: ["This is an", "example of", "character", "splitting."]
+----
+
+=== With Overlap
+
+Adding 4 characters of overlap and a custom blank delimiter
+
+[source,java]
+----
+Config config = Config.builder()
+                       .chunkSize(35)
+                       .chunkOverlap(4)
+                       .delimiter("")
+                       .build();
+FixedChunker chunker = new FixedChunker(config);
+String text = "This is the text I would like to chunk up. It is the example text for this exercise";
+List<Chunk> chunks = chunker.split(text);
+
+// Result: ["This is the text I would like to ch", "o chunk up. It is the example text", "ext for this exercise"]
+----
+
+== Pros and Cons
+
+=== Pros
+* Easy to implement and understand
+* Predictable chunk sizes
+* Fast processing
+
+=== Cons
+* Doesn't consider text structure or context
+* May split words inappropriately
+* Overlap creates duplicate data 

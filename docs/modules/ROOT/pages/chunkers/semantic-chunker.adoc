@@ -1,0 +1,116 @@
+= Semantic Chunker
+:page-layout: article
+
+== Overview
+
+The Semantic Chunker uses AI embeddings to split text based on semantic relationships rather than fixed character counts. This approach is ideal for retrieval-augmented generation (RAG) applications where context preservation is crucial.
+
+== How It Works
+
+=== Sentence Splitting
+Split the entire text into sentences using delimiters like `.`, `?`, and `!` (alternative strategies can also be used).
+
+=== Mapping Sentences
+Transform the list of sentences into the following structure (create an index per basic pre-chunking)
+
+[source,json]
+----
+[
+  {
+    "sentence": "this is the sentence.",
+    "index": 0
+  },
+  {
+    "sentence": "this is the next sentence.",
+    "index": 1
+  },
+  {
+    "sentence": "this is the last sentence.",
+    "index": 2
+  }
+]
+----
+
+=== Combining Sentences:
+
+Combine each sentence with its preceding and succeeding sentences (the number of sentences will be given by a bufferSize variable ) to reduce noise and better capture relationships. Add a key `combined` for this combined text.
+
+Example for buffer size 1:
+[source,json]
+----
+[
+  {
+    "sentence": "this is the sentence.",
+    "combined": "this is the sentence. this is the next sentence.",
+    "index": 0
+  },
+  {
+    "sentence": "this is the next sentence.",
+    "combined": "this is the sentence. this is the next sentence. this is the last sentence.",
+    "index": 1
+  },
+  {
+    "sentence": "this is the last sentence.",
+    "combined": "this is the next sentence. this is the last sentence.",
+    "index": 2
+  }
+]
+----
+
+=== Generating Embeddings:
+
+Compute the embedding of each `combined`.
+
+[source,json]
+----
+[
+  {
+    "sentence": "this is the sentence.",
+    "combined": "this is the sentence. this is the next sentence.",
+    "embedding": [0.002, 0.003, 0.004],
+    "index": 0
+  }
+]
+----
+
+=== Calculating Distances:
+
+Compute the cosine distances between sequential pairs.
+
+=== Identifying Breakpoints:
+
+Analyze the distances to identify sections where distances are smaller (indicating related content) and areas with larger distances (indicating less related content).
+
+=== Determining Split Points:
+
+Use the 95th percentile of the distances as the threshold for determining breakpoints (can use any other percentile or threshold technique).
+
+image::semantic-chunk.png[]
+
+NOTE: Image taken from this https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb[post]
+
+
+=== Splitting Chunks:
+
+Split the text into chunks at the identified breakpoints.
+
+== Advantages
+
+* Preserves semantic context
+* Adapts to content structure
+* Better for RAG applications
+* Reduces information loss
+
+== Disadvantages
+
+* Needs an embedding model (thus the system needs to be able to handle it so performance issues are not faced)
+
+== Requirements
+
+* ONNX Runtime for embedding generation
+* Pre-trained embedding model (included in the module)
+* By default `all-minilm-l6-v2` is used
+
+== Acknowledgments
+
+This module is inspired by Greg Kamradt's post https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb[text splitting ideas]
