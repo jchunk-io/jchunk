@@ -45,8 +45,8 @@ public class FixedChunker implements IChunker {
      * @return a list of split sentences
      */
     public List<String> splitIntoSentences(String content, Config config) {
-        String delimiter = config.getDelimiter();
-        Delimiter keepDelimiter = config.getKeepDelimiter();
+        String delimiter = config.delimiter();
+        Delimiter keepDelimiter = config.keepDelimiter();
 
         if (delimiter.isEmpty()) {
             return content.chars().mapToObj(c -> String.valueOf((char) c)).toList();
@@ -122,10 +122,10 @@ public class FixedChunker implements IChunker {
      * @return list of chunks
      */
     private List<Chunk> mergeSentences(List<String> sentences, Config config) {
-        String delimiter = config.getDelimiter();
-        int chunkSize = config.getChunkSize();
-        int chunkOverlap = config.getChunkOverlap();
-        boolean trimWhitespace = config.getTrimWhitespace();
+        String delimiter = config.delimiter();
+        int chunkSize = config.chunkSize();
+        int chunkOverlap = config.chunkOverlap();
+        boolean trimWhitespace = config.trimWhitespace();
 
         int currentLen = 0;
         int delimiterLen = delimiter.length();
@@ -140,7 +140,7 @@ public class FixedChunker implements IChunker {
 
             if (currentLen + sentenceLength + (currentChunk.isEmpty() ? 0 : delimiterLen) > chunkSize) {
                 if (currentLen > chunkSize) {
-                    final var msg = String.format(LONGER_THAN_THE_SPECIFIED, currentLen, config.getChunkSize());
+                    final var msg = String.format(LONGER_THAN_THE_SPECIFIED, currentLen, config.chunkSize());
                     logger.warning(msg);
                 }
 
