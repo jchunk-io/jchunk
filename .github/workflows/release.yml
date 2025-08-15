@@ -11,6 +11,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure push with PAT
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/jchunk-io/jchunk.git
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -21,8 +30,10 @@ jobs:
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
           cache: maven
 
-      - name: Build & Stage locally
-        run: mvn -B -Ppublication -DskipTests deploy
+      - name: Maven Release (prepare & perform)
+        run: |
+          export GPG_TTY=$(tty)
+          mvn -B -Ppublication -Darguments="-DskipTests" release:prepare release:perform
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
