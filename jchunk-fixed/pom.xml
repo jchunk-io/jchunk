@@ -12,6 +12,7 @@
     
     <name>JChunk - Fixed Chunker</name>
     <description>Fixed Chunker for Java</description>
+    <url>https://github.com/jchunk-io/jchunk</url>
     
     <dependencies>
         <dependency>

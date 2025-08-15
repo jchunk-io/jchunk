@@ -5,22 +5,15 @@
         <groupId>io.jchunk</groupId>
         <artifactId>jchunk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     
     <artifactId>jchunk-semantic</artifactId>
     <packaging>jar</packaging>
+
     <name>JChunk - Semantic Chunker</name>
     <description>Semantic Chunker for Java</description>
     <url>https://github.com/jchunk-io/jchunk</url>
-    
-    <scm>
-        <connection>scm:git:git://github.com/jchunk-io/jchunk.git</connection>
-        <developerConnection>scm:git:git@github.com:jchunk-io/jchunk.git</developerConnection>
-        <tag>v0.0.0</tag>
-        <url>https://github.com/jchunk-io/jchunk</url>
-    </scm>
-    
+
     <properties>
         <onnxruntime.version>1.22.0</onnxruntime.version>
         <djl.version>0.34.0</djl.version>

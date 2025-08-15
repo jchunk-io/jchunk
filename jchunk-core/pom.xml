@@ -12,5 +12,6 @@
     
     <name>JChunk - Core</name>
     <description>Base definitions for jchunk module</description>
+    <url>https://github.com/jchunk-io/jchunk</url>
     
 </project>

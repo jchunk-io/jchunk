@@ -12,6 +12,7 @@
     
     <name>JChunk - Recursive Character Chunker</name>
     <description>Recursive Character Chunker for Java</description>
+    <url>https://github.com/jchunk-io/jchunk</url>
     
     <dependencies>
         <dependency>
