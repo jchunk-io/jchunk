@@ -6,7 +6,7 @@
 ## A Java Library for Text Chunking
 
 JChunk project is simple library that enables different types of text splitting strategies, essential for RAG applications.
-
+test change
 ## Docs
 
 [Click here to see documentation](docs/modules/ROOT/pages/index.adoc)
