@@ -12,5 +12,6 @@
     
     <name>JChunk - Commons</name>
     <description>Commons for jchunk chunkers</description>
+    <url>https://github.com/jchunk-io/jchunk</url>
     
 </project>
