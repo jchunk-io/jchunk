@@ -55,7 +55,7 @@
         
         <!-- code scan -->
         <sonarqube.version>5.1.0.4751</sonarqube.version>
-        <sonar.organization>jchunk</sonar.organization>
+        <sonar.organization>jchunk-io</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.coverage.jacoco.xmlReportPaths>**/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         
