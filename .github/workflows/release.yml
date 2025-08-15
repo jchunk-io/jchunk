@@ -4,6 +4,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -23,14 +24,22 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           cache: maven
 
-      - name: Maven Release (prepare only)
+      - name: Maven Release (prepare locally, no push)
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           export GPG_TTY=$(tty)
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          mvn -B -Darguments="-DskipTests -Ppublication" release:prepare
+          mvn -B -DpushChanges=false -DlocalCheckout=true \
+            -Darguments="-DskipTests -Ppublication" \
+            release:prepare
+
+      - name: Push release tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "Pushing tag $TAG"
+          git push origin "$TAG"
 
       - name: Build & Stage locally
         run: mvn -B -Ppublication -DskipTests deploy
@@ -46,6 +55,15 @@ jobs:
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           JRELEASER_MAVENCENTRAL_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Create release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(release): apply release plugin changes"
+          title: "chore(release): apply release plugin changes"
+          body: "Automated PR with release commit and next development version."
+          branch: chore/release-changes
+          delete-branch: true
 
       - name: JReleaser release output
         if: always()
