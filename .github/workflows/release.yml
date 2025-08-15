@@ -9,6 +9,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,7 +23,7 @@ jobs:
           java-version: 21
           distribution: temurin
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
           cache: maven
 
       - name: Maven Release (prepare locally, no push)
@@ -41,13 +43,22 @@ jobs:
           echo "Pushing tag $TAG"
           git push origin "$TAG"
 
-      - name: Build & Stage locally
+      - name: Build & Stage locally (release tree)
+        working-directory: target/checkout
         run: mvn -B -Ppublication -DskipTests deploy
+
+      - name: Extract Maven coords (release tree)
+        id: coords
+        working-directory: target/checkout
+        run: |
+          echo "GROUP=$(mvn -q help:evaluate -Dexpression=project.groupId -DforceStdout)" >> $GITHUB_ENV
+          echo "VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)" >> $GITHUB_ENV
 
       - name: Run JReleaser (full release)
         uses: jreleaser/release-action@v2
         with:
           arguments: full-release
+          working-directory: target/checkout
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
@@ -55,15 +66,8 @@ jobs:
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           JRELEASER_MAVENCENTRAL_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-
-      - name: Create release PR
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore(release): apply release plugin changes"
-          title: "chore(release): apply release plugin changes"
-          body: "Automated PR with release commit and next development version."
-          branch: chore/release-changes
-          delete-branch: true
+          JRELEASER_PROJECT_JAVA_GROUP_ID: ${{ env.GROUP }}
+          JRELEASER_PROJECT_VERSION: ${{ env.VERSION }}
 
       - name: JReleaser release output
         if: always()
@@ -71,5 +75,5 @@ jobs:
         with:
           name: jreleaser-release
           path: |
-            out/jreleaser/trace.log
-            out/jreleaser/output.properties
+            target/checkout/out/jreleaser/trace.log
+            target/checkout/out/jreleaser/output.properties
