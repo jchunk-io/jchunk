@@ -4,25 +4,13 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Configure push with PAT
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/jchunk-io/jchunk.git
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,22 +21,15 @@ jobs:
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
           cache: maven
 
-      - name: Maven Release (prepare locally, no push)
-        run: |
-          export GPG_TTY=$(tty)
-          mvn -B \
-            -DpushChanges=false \
-            -DlocalCheckout=false \
-            -Darguments="-DskipTests -Ppublication" \
-            release:prepare
-
       - name: Build & Stage locally
-        working-directory: target/checkout
         run: mvn -B -Ppublication -DskipTests deploy
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
       - name: Extract Maven coords
         id: coords
-        working-directory: target/checkout
         run: |
           echo "GROUP=$(mvn -q help:evaluate -Dexpression=project.groupId -DforceStdout)" >> $GITHUB_ENV
           echo "VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)" >> $GITHUB_ENV
@@ -57,7 +38,6 @@ jobs:
         uses: jreleaser/release-action@v2
         with:
           arguments: full-release
-          working-directory: target/checkout
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
@@ -68,20 +48,11 @@ jobs:
           JRELEASER_PROJECT_JAVA_GROUP_ID: ${{ env.GROUP }}
           JRELEASER_PROJECT_VERSION: ${{ env.VERSION }}
 
-      - name: Push release branch & tag to main
-        if: ${{ success() }}
-        working-directory: target/checkout
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/jchunk-io/jchunk.git
-          TAG=$(git describe --tags --abbrev=0)
-          git push origin HEAD:main
-          git push origin "$TAG"
-
       - name: JReleaser release output
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jreleaser-release
           path: |
-            target/checkout/out/jreleaser/trace.log
-            target/checkout/out/jreleaser/output.properties
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties
