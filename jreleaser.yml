@@ -1,0 +1,64 @@
+project:
+  name: jchunk
+  description: Library for building RAG applications in Java
+  longDescription: |
+    lightweight and flexible library designed to provide multiple strategies for text chunking within Java applications
+  links:
+    homepage: https://{{repoHost}}/{{repoOwner}}/{{repoName}}
+    faq: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/discussions
+  authors:
+    - Pablo Sanchidrian Herrera
+  license: Apache-2.0
+  inceptionYear: "2025"
+
+checksum:
+  algorithms: [SHA_256, SHA_512]
+
+signing:
+  active: ALWAYS
+  armored: true
+
+deploy:
+  maven:
+    mavenCentral:
+      sonatype:
+        active: ALWAYS
+        url: "https://central.sonatype.com/api/v1/publisher"
+        applyMavenCentralRules: true
+        snapshotSupported: true
+        retryDelay: 20
+        maxRetries: 100
+        stagingRepositories:
+          - target/staging-deploy
+
+release:
+  github:
+    owner: jchunk-io
+    name: jchunk
+    releaseName: '{{tagName}}'
+    overwrite: true
+    sign: true
+    discussionCategoryName: Announcements
+    issues:
+      enabled: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+      extraProperties:
+        categorizeScopes: true
+      labelers:
+        - label: 'dependencies'
+          title: 'regex:^(?:deps(?:\(.*\))?!?):\s.*'
+          order: 120
+      categories:
+        - title: 'Dependencies'
+          key: 'dependencies'
+          order: 70
+          labels: ['dependencies']
+      hide:
+        categories: ['merge']
+        contributors: ['GitHub', 'dependabot', 'github-actions']
+      replacers:
+        - search: 'deps: '

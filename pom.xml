@@ -13,8 +13,8 @@
     
     <licenses>
         <license>
-            <name>Apache-2.0</name>
-            <url>https://spdx.org/licenses/Apache-2.0.html</url>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -35,8 +35,8 @@
     </modules>
     
     <scm>
-        <connection>scm:git:git://github.com/jchunk-io/jchunk.git</connection>
-        <developerConnection>scm:git:git@github.com:jchunk-io/jchunk.git</developerConnection>
+        <connection>scm:git:https://github.com/jchunk-io/jchunk.git</connection>
+        <developerConnection>scm:git:https://github.com/jchunk-io/jchunk.git</developerConnection>
         <tag>HEAD</tag>
         <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
@@ -75,6 +75,7 @@
         <scm.version>2.1.0</scm.version>
         <maven-source.version>3.3.1</maven-source.version>
         <maven-deploy.version>3.1.4</maven-deploy.version>
+        <maven-gpg.version>3.2.8</maven-gpg.version>
         <javadoc.version>3.11.2</javadoc.version>
     </properties>
     
@@ -236,6 +237,20 @@
                         <configuration>
                             <altDeploymentRepository>local::file:./target/staging-deploy</altDeploymentRepository>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
