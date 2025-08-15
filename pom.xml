@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>io.jchunk</groupId>
     <artifactId>jchunk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-
+    
     <name>JChunk</name>
     <description>lightweight and flexible library designed to provide multiple strategies for text chunking within Java applications</description>
     <url>https://github.com/jchunk-io/jchunk</url>
-
+    
     <licenses>
         <license>
             <name>Apache-2.0</name>
@@ -18,14 +18,14 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
+    
     <developers>
         <developer>
             <name>Pablo Sanchidrian Herrera</name>
             <url>https://github.com/PabloSanchi</url>
         </developer>
     </developers>
-
+    
     <modules>
         <module>commons</module>
         <module>jchunk-core</module>
@@ -33,53 +33,51 @@
         <module>jchunk-recursive-character</module>
         <module>jchunk-semantic</module>
     </modules>
-
+    
     <scm>
         <connection>scm:git:git://github.com/jchunk-io/jchunk.git</connection>
         <developerConnection>scm:git:git@github.com:jchunk-io/jchunk.git</developerConnection>
         <tag>HEAD</tag>
         <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
-
+    
     <issueManagement>
         <system>Github Issues</system>
         <url>https://github.com/jchunk-io/jchunk/issues</url>
     </issueManagement>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>21</java.version>
-		<maven.compiler.source>21</maven.compiler.source>
-		<maven.compiler.target>21</maven.compiler.target>
-
-		<!-- code scan -->
-		<sonarqube.version>5.1.0.4751</sonarqube.version>
-		<sonar.organization>jchunk</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.coverage.jacoco.xmlReportPaths>
-			**/target/site/jacoco/jacoco.xml
-		</sonar.coverage.jacoco.xmlReportPaths>
-
-		<!-- test versions -->
-		<junit.version>5.13.4</junit.version>
-		<assertj.version>3.27.4</assertj.version>
-		<mockito.version>5.18.0</mockito.version>
-
-		<!-- plugin versions -->
-		<spotless.version>2.46.1</spotless.version>
-		<palantir-format.version>2.39.0</palantir-format.version>
-		<surefire.version>3.5.3</surefire.version>
-		<maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
-		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-		<maven-release-plugin.version>3.0.0-M5</maven-release-plugin.version>
-		<jacoco.version>0.8.13</jacoco.version>
-		<scm.version>2.1.0</scm.version>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        
+        <!-- code scan -->
+        <sonarqube.version>5.1.0.4751</sonarqube.version>
+        <sonar.organization>jchunk</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>**/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        
+        <!-- test versions -->
+        <junit.version>5.13.4</junit.version>
+        <assertj.version>3.27.4</assertj.version>
+        <mockito.version>5.18.0</mockito.version>
+        
+        <!-- plugin versions -->
+        <spotless.version>2.46.1</spotless.version>
+        <palantir-format.version>2.39.0</palantir-format.version>
+        <surefire.version>3.5.3</surefire.version>
+        <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-release-plugin.version>3.0.0-M5</maven-release-plugin.version>
+        <jacoco.version>0.8.13</jacoco.version>
+        <scm.version>2.1.0</scm.version>
         <maven-source.version>3.3.1</maven-source.version>
         <maven-deploy.version>3.1.4</maven-deploy.version>
         <javadoc.version>3.11.2</javadoc.version>
     </properties>
-
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -102,7 +100,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -113,7 +111,7 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-
+            
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
@@ -124,7 +122,7 @@
                     </includes>
                 </configuration>
             </plugin>
-
+            
             <!-- code lint, coverage and scan -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -149,7 +147,7 @@
                     </pom>
                 </configuration>
             </plugin>
-
+            
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -185,7 +183,7 @@
                     </execution>
                 </executions>
             </plugin>
-
+            
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
@@ -193,7 +191,7 @@
             </plugin>
         </plugins>
     </build>
-
+    
     <profiles>
         <profile>
             <id>publication</id>
@@ -243,5 +241,5 @@
             </build>
         </profile>
     </profiles>
-
+    
 </project>
