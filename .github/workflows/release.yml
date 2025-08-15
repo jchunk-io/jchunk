@@ -16,6 +16,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure push with PAT
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/jchunk-io/jchunk.git
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -27,27 +34,19 @@ jobs:
           cache: maven
 
       - name: Maven Release (prepare locally, no push)
-        env:
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           export GPG_TTY=$(tty)
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          mvn -B -DpushChanges=false -DlocalCheckout=true \
+          mvn -B \
+            -DpushChanges=false \
+            -DlocalCheckout=false \
             -Darguments="-DskipTests -Ppublication" \
             release:prepare
 
-      - name: Push release tag
-        run: |
-          TAG=$(git describe --tags --abbrev=0)
-          echo "Pushing tag $TAG"
-          git push origin "$TAG"
-
-      - name: Build & Stage locally (release tree)
+      - name: Build & Stage locally
         working-directory: target/checkout
         run: mvn -B -Ppublication -DskipTests deploy
 
-      - name: Extract Maven coords (release tree)
+      - name: Extract Maven coords
         id: coords
         working-directory: target/checkout
         run: |
@@ -68,6 +67,15 @@ jobs:
           JRELEASER_MAVENCENTRAL_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           JRELEASER_PROJECT_JAVA_GROUP_ID: ${{ env.GROUP }}
           JRELEASER_PROJECT_VERSION: ${{ env.VERSION }}
+
+      - name: Push release branch & tag to main
+        if: ${{ success() }}
+        working-directory: target/checkout
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/jchunk-io/jchunk.git
+          TAG=$(git describe --tags --abbrev=0)
+          git push origin HEAD:main
+          git push origin "$TAG"
 
       - name: JReleaser release output
         if: always()
