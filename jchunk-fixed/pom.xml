@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.jchunk</groupId>
         <artifactId>jchunk</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
     </parent>
     
     <artifactId>jchunk-fixed</artifactId>
@@ -32,7 +32,7 @@
     <scm>
         <connection>scm:git:https://github.com/jchunk-io/jchunk.git</connection>
         <developerConnection>scm:git:https://github.com/jchunk-io/jchunk.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.0.1</tag>
         <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
     
@@ -40,12 +40,12 @@
         <dependency>
             <groupId>io.jchunk</groupId>
             <artifactId>jchunk-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>io.jchunk</groupId>
             <artifactId>commons</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
         
         <!-- test -->
