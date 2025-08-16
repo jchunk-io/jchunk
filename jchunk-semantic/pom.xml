@@ -5,19 +5,34 @@
         <groupId>io.jchunk</groupId>
         <artifactId>jchunk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     
     <artifactId>jchunk-semantic</artifactId>
     <packaging>jar</packaging>
+    
     <name>JChunk - Semantic Chunker</name>
     <description>Semantic Chunker for Java</description>
     <url>https://github.com/jchunk-io/jchunk</url>
     
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <name>Pablo Sanchidrian Herrera</name>
+            <url>https://github.com/PabloSanchi</url>
+        </developer>
+    </developers>
+    
     <scm>
-        <connection>scm:git:git://github.com/jchunk-io/jchunk.git</connection>
-        <developerConnection>scm:git:git@github.com:jchunk-io/jchunk.git</developerConnection>
-        <tag>v0.0.0</tag>
+        <connection>scm:git:https://github.com/jchunk-io/jchunk.git</connection>
+        <developerConnection>scm:git:https://github.com/jchunk-io/jchunk.git</developerConnection>
+        <tag>HEAD</tag>
         <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
     
