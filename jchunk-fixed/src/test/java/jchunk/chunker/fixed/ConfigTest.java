@@ -16,11 +16,11 @@ class ConfigTest {
     void testDefaultConfig() {
         Config config = Config.builder().build();
 
-        assertThat(config.getChunkSize()).isEqualTo(1000);
-        assertThat(config.getChunkOverlap()).isEqualTo(100);
-        assertThat(config.getDelimiter()).isEqualTo(" ");
-        assertThat(config.getTrimWhitespace()).isTrue();
-        assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.NONE);
+        assertThat(config.chunkSize()).isEqualTo(1000);
+        assertThat(config.chunkOverlap()).isEqualTo(100);
+        assertThat(config.delimiter()).isEqualTo(" ");
+        assertThat(config.trimWhitespace()).isTrue();
+        assertThat(config.keepDelimiter()).isEqualTo(Delimiter.NONE);
     }
 
     @Test
@@ -33,11 +33,11 @@ class ConfigTest {
                 .keepDelimiter(Delimiter.START)
                 .build();
 
-        assertThat(config.getChunkSize()).isEqualTo(35);
-        assertThat(config.getChunkOverlap()).isEqualTo(4);
-        assertThat(config.getDelimiter()).isBlank();
-        assertThat(config.getTrimWhitespace()).isFalse();
-        assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.START);
+        assertThat(config.chunkSize()).isEqualTo(35);
+        assertThat(config.chunkOverlap()).isEqualTo(4);
+        assertThat(config.delimiter()).isBlank();
+        assertThat(config.trimWhitespace()).isFalse();
+        assertThat(config.keepDelimiter()).isEqualTo(Delimiter.START);
     }
 
     @ParameterizedTest

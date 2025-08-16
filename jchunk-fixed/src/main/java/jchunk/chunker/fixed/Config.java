@@ -7,47 +7,12 @@ import jchunk.chunker.Delimiter;
  *
  * @author Pablo Sanchidrian Herrera
  */
-public class Config {
+public record Config(
+        int chunkSize, int chunkOverlap, String delimiter, boolean trimWhitespace, Delimiter keepDelimiter) {
 
-    private final int chunkSize;
-
-    private final int chunkOverlap;
-
-    private final String delimiter;
-
-    private final boolean trimWhitespace;
-
-    private final Delimiter keepDelimiter;
-
-    public int getChunkSize() {
-        return chunkSize;
-    }
-
-    public int getChunkOverlap() {
-        return chunkOverlap;
-    }
-
-    public String getDelimiter() {
-        return delimiter;
-    }
-
-    public boolean getTrimWhitespace() {
-        return trimWhitespace;
-    }
-
-    public Delimiter getKeepDelimiter() {
-        return keepDelimiter;
-    }
-
-    public Config(int chunkSize, int chunkOverlap, String delimiter, boolean trimWhitespace, Delimiter keepDelimiter) {
-        this.chunkSize = chunkSize;
-        this.chunkOverlap = chunkOverlap;
-        this.delimiter = delimiter;
-        this.trimWhitespace = trimWhitespace;
-        this.keepDelimiter = keepDelimiter;
-    }
-
-    /** {@return the default config} */
+    /**
+     * @return the default config
+     */
     public static Config defaultConfig() {
         return builder().build();
     }
