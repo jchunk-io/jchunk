@@ -224,7 +224,7 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <phase>deploy</phase>
+                        <phase>verify</phase>
                     </execution>
                 </executions>
             </plugin>
