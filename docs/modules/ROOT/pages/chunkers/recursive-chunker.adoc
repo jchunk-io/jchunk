@@ -1,0 +1,76 @@
+= Recursive Character Chunker
+:page-layout: article
+
+== Overview
+
+The Recursive Character Chunker provides more intelligent text splitting by using a hierarchy of separators. It attempts to split on the most meaningful separators first, falling back to less meaningful ones if needed.
+
+== Configuration
+
+[source,java]
+----
+// using default config
+RecursiveCharacterChunker chunker = new RecursiveCharacterChunker();
+
+// with custom config
+Config config = Config.builder()
+        .chunkSize(10)
+        .chunkOverlap(0)
+        .delimiters(List.of(";"))
+        .trimWhitespace(true)
+        .keepDelimter(Delimiter.START)
+        .build();
+
+RecursiveCharacterChunker chunker = new RecursiveCharacterChunker();
+----
+
+== Default Separators
+
+The default separator hierarchy is:
+
+. `\n\n` (double newlines)
+. `\n` (single newlines)
+. `\s` (single space)
+. `` (empty string)
+
+== Example
+
+[source,java]
+----
+Config config = Config.builder().chunkSize(15).chunkOverlap(0).build();
+RecursiveCharacterChunker chunker = new RecursiveCharacterChunker(config);
+List<Chunk> chunks = chunker.split("split this text\n\nI need it\n to be done as soon as possible");
+
+// Result: ["split this text", "I need it", "to be done as", "soon as", "possible"]
+----
+
+== Custom Separators
+
+[source,java]
+----
+List<String> customSeparators = List.of("-", ".");
+Config config = Config.builder()
+        .chunkSize(5)
+        .chunkOverlap(0)
+        .separators(List.of("-", "."))
+        .build();
+
+RecursiveCharacterChunker chunker = new RecursiveCharacterChunker(config);
+List<Chunk> chunks = chunker.split("");
+
+// Result: ["give", "- me a", "_ hand"]
+
+----
+
+== Pros and Cons
+
+=== Pros
+* Easy to implement and understand
+* More advanced than fixed chunking
+* Predictable chunk sizes
+* Fast processing
+
+=== Cons
+* Doesn't consider context
+* May produce larger chunks than specified
+* Overlap creates duplicate data
