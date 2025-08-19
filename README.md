@@ -13,22 +13,16 @@ JChunk project is simple library that enables different types of text splitting 
 
 ## Building
 
-To build with running unit tests
+To build with tests
 
 ```sh
-./mvnw clean verify
+./mvnw clean verify -Dgpg.skip=true
 ```
 
 To reformat using the java-format plugin
 
 ```sh
 ./mvnw spotless:apply
-```
-
-To update the year on license headers using the license-maven-plugin
-
-```sh
-./mvnw license:update-file-header -Plicense
 ```
 
 To check javadocs using the javadoc:javadoc
