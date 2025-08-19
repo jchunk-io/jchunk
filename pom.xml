@@ -63,7 +63,7 @@
         <!-- test versions -->
         <junit.version>5.13.4</junit.version>
         <assertj.version>3.27.4</assertj.version>
-        <mockito.version>5.18.0</mockito.version>
+        <mockito.version>5.19.0</mockito.version>
         
         <!-- plugin versions -->
         <spotless.version>2.46.1</spotless.version>
