@@ -1,4 +1,4 @@
-package jchunk.chunker.recursive;
+package io.jchunk.recursive;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,11 +17,11 @@ class ConfigTest {
     void testDefaultConfig() {
         Config config = Config.defaultConfig();
 
-        assertThat(config.chunkSize()).isEqualTo(100);
-        assertThat(config.chunkOverlap()).isEqualTo(20);
-        assertThat(config.delimiters()).containsExactly("\n\n", "\n", " ", "");
-        assertThat(config.keepDelimiter()).isEqualTo(Delimiter.START);
-        assertThat(config.trimWhiteSpace()).isTrue();
+        assertThat(config.getChunkSize()).isEqualTo(100);
+        assertThat(config.getChunkOverlap()).isEqualTo(20);
+        assertThat(config.getDelimiters()).containsExactly("\n\n", "\n", " ", "");
+        assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.START);
+        assertThat(config.getTrimWhiteSpace()).isTrue();
     }
 
     @Test
@@ -34,18 +34,18 @@ class ConfigTest {
                 .trimWhitespace(false)
                 .build();
 
-        assertThat(config.chunkSize()).isEqualTo(50);
-        assertThat(config.chunkOverlap()).isEqualTo(10);
-        assertThat(config.delimiters()).containsExactly("-", "!", "?");
-        assertThat(config.keepDelimiter()).isEqualTo(Delimiter.END);
-        assertThat(config.trimWhiteSpace()).isFalse();
+        assertThat(config.getChunkSize()).isEqualTo(50);
+        assertThat(config.getChunkOverlap()).isEqualTo(10);
+        assertThat(config.getDelimiters()).containsExactly("-", "!", "?");
+        assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.END);
+        assertThat(config.getTrimWhiteSpace()).isFalse();
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidConfiguration")
     void testInvalidConfig(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)
-                .isInstanceOf(AssertionError.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
     }
 

@@ -1,12 +1,13 @@
-package jchunk.chunker.recursive;
+package io.jchunk.recursive;
 
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.core.chunk.IChunker;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import jchunk.chunker.Delimiter;
-import jchunk.chunker.core.chunk.Chunk;
-import jchunk.chunker.core.chunk.IChunker;
 
 /**
  * {@link RecursiveCharacterChunker} is a class that implements the {@link IChunker} interface and
@@ -33,7 +34,7 @@ public class RecursiveCharacterChunker implements IChunker {
 
     @Override
     public List<Chunk> split(String content) {
-        return splitContent(content, config.delimiters(), new AtomicInteger(0));
+        return splitContent(content, config.getDelimiters(), new AtomicInteger(0));
     }
 
     /**
@@ -52,12 +53,12 @@ public class RecursiveCharacterChunker implements IChunker {
         var splits = splitWithDelimiter(content, delimiter);
 
         var goodSplits = new ArrayList<String>();
-        var delimiterToUse = config.keepDelimiter() != Delimiter.NONE ? "" : delimiter;
+        var delimiterToUse = config.getKeepDelimiter() != Delimiter.NONE ? "" : delimiter;
 
         var chunks = new ArrayList<Chunk>();
 
         for (String split : splits) {
-            if (split.length() < config.chunkSize()) {
+            if (split.length() < config.getChunkSize()) {
                 goodSplits.add(split);
             } else {
                 if (!goodSplits.isEmpty()) {
@@ -67,10 +68,8 @@ public class RecursiveCharacterChunker implements IChunker {
                 }
 
                 if (newDelimiters.isEmpty()) {
-                    Chunk chunk = Chunk.builder()
-                            .id(index.getAndIncrement())
-                            .content(config.trimWhiteSpace() ? split.trim() : split)
-                            .build();
+                    var chunkContent = config.getTrimWhiteSpace() ? split.trim() : split;
+                    Chunk chunk = Chunk.of(index.getAndIncrement(), chunkContent);
                     chunks.add(chunk);
                 } else {
                     List<Chunk> generatedChunks = splitContent(split, newDelimiters, index);
@@ -127,7 +126,7 @@ public class RecursiveCharacterChunker implements IChunker {
         String withDelimiter = "((?<=%1$s)|(?=%1$s))";
         List<String> preSplits = new ArrayList<>(List.of(content.split(String.format(withDelimiter, delimiter))));
 
-        return config.keepDelimiter() == Delimiter.START
+        return config.getKeepDelimiter() == Delimiter.START
                 ? splitWithDelimiterStart(preSplits)
                 : splitWithDelimiterEnd(preSplits);
     }
@@ -184,10 +183,10 @@ public class RecursiveCharacterChunker implements IChunker {
         for (String sentence : sentences) {
             int sentenceLength = sentence.length();
 
-            if (currentLen + sentenceLength + (currentChunk.isEmpty() ? 0 : delimiterLen) > config.chunkSize()) {
+            if (currentLen + sentenceLength + (currentChunk.isEmpty() ? 0 : delimiterLen) > config.getChunkSize()) {
 
-                if (currentLen > config.chunkSize()) {
-                    var msg = String.format(LONGER_THAN_THE_SPECIFIED, currentLen, config.chunkSize());
+                if (currentLen > config.getChunkSize()) {
+                    var msg = String.format(LONGER_THAN_THE_SPECIFIED, currentLen, config.getChunkSize());
                     logger.warning(msg);
                 }
 
@@ -218,10 +217,7 @@ public class RecursiveCharacterChunker implements IChunker {
      */
     private void addChunk(List<Chunk> chunks, Deque<String> currentChunk, String delimiter, AtomicInteger index) {
         var generatedSentence = joinSentences(new ArrayList<>(currentChunk), delimiter);
-        var chunk = Chunk.builder()
-                .id(index.getAndIncrement())
-                .content(generatedSentence)
-                .build();
+        var chunk = Chunk.of(index.getAndIncrement(), generatedSentence);
         chunks.add(chunk);
     }
 
@@ -234,7 +230,7 @@ public class RecursiveCharacterChunker implements IChunker {
      * @return the adjusted length of the chunk
      */
     private int adjustCurrentChunkForOverlap(Deque<String> currentChunk, int currentLen, int delimiterLen) {
-        while (currentLen > config.chunkOverlap() && !currentChunk.isEmpty()) {
+        while (currentLen > config.getChunkOverlap() && !currentChunk.isEmpty()) {
             currentLen -= currentChunk.removeFirst().length() + (currentChunk.isEmpty() ? 0 : delimiterLen);
         }
         return currentLen;
@@ -249,7 +245,7 @@ public class RecursiveCharacterChunker implements IChunker {
      */
     private String joinSentences(List<String> sentences, String delimiter) {
         var generatedSentence = String.join(delimiter, sentences);
-        if (config.trimWhiteSpace()) {
+        if (config.getTrimWhiteSpace()) {
             generatedSentence = generatedSentence.trim();
         }
 
