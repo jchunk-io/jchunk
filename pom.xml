@@ -27,6 +27,7 @@
     </developers>
     
     <modules>
+        <module>assertions</module>
         <module>commons</module>
         <module>jchunk-core</module>
         <module>jchunk-fixed</module>

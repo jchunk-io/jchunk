@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.jchunk</groupId>
+        <artifactId>jchunk</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>assertions</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>JChunk - Assertions</name>
+    <description>Assertions for jchunk</description>
+    <url>https://github.com/jchunk-io/jchunk</url>
+    
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <name>Pablo Sanchidrian Herrera</name>
+            <url>https://github.com/PabloSanchi</url>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:https://github.com/jchunk-io/jchunk.git</connection>
+        <developerConnection>scm:git:https://github.com/jchunk-io/jchunk.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/jchunk-io/jchunk</url>
+    </scm>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+    </dependencies>
+    
+</project>
