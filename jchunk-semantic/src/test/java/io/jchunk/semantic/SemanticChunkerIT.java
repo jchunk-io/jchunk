@@ -2,6 +2,7 @@ package io.jchunk.semantic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jchunk.core.chunk.Chunk;
 import io.jchunk.semantic.embedder.Embedder;
 import io.jchunk.semantic.embedder.JChunkEmbedder;
 import java.io.IOException;
@@ -38,6 +39,18 @@ class SemanticChunkerIT {
 
         // then
         assertThat(chunks).isNotEmpty();
+    }
+
+    @Test
+    void getChunksUniqueSentence() {
+        // given
+        var text = "This is a example test to split.";
+
+        // when
+        var chunks = semanticChunker.split(text);
+
+        // then
+        assertThat(chunks).hasSize(1).extracting(Chunk::content).containsExactly(text);
     }
 
     @Test

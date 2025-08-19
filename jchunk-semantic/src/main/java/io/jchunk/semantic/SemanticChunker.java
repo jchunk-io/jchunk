@@ -34,6 +34,13 @@ public class SemanticChunker implements IChunker {
     @Override
     public List<Chunk> split(String content) {
         var sentences = splitSentences(content, config.sentenceSplittingStrategy());
+
+        if (sentences.size() == 1) {
+            var sentence = sentences.getFirst();
+            var chunk = Chunk.of(0, sentence.getContent());
+            return List.of(chunk);
+        }
+
         sentences = combineSentences(sentences, config.bufferSize());
         sentences = embedSentences(embedder, sentences);
         var similarities = calculateSimilarities(sentences);
@@ -69,10 +76,6 @@ public class SemanticChunker implements IChunker {
     List<Sentence> combineSentences(List<Sentence> sentences, Integer bufferSize) {
         Assertions.notNull(sentences, "The list of sentences cannot be null");
         Assertions.notEmpty(sentences, "The list of sentences cannot be empty");
-
-        if (sentences.size() <= 1) { // nothing to combine
-            return sentences;
-        }
 
         Assertions.notNull(bufferSize, "The buffer size cannot be null");
         Assertions.isTrue(bufferSize > 0, "The buffer size must be greater than 0");
@@ -186,6 +189,7 @@ public class SemanticChunker implements IChunker {
     @VisibleForTesting
     List<Integer> calculateBreakPoints(final List<Double> distances, final int percentile) {
         Assertions.notNull(distances, "The list of distances cannot be null");
+        Assertions.notEmpty(distances, "The list of distances cannot be empty");
 
         var breakpointDistanceThreshold = calculatePercentile(distances, percentile);
 
@@ -195,7 +199,7 @@ public class SemanticChunker implements IChunker {
                 .toList();
     }
 
-    private static Double calculatePercentile(final List<Double> distances, final int percentile) {
+    private double calculatePercentile(final List<Double> distances, final int percentile) {
         Assertions.notNull(distances, "The list of distances cannot be null");
         Assertions.isTrue(
                 percentile > 0 && percentile < 100, "The percentile must be greater than 0 and less than 100");

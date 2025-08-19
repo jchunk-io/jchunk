@@ -246,6 +246,22 @@ class SemanticChunkerTest {
         }
     }
 
+    @Test
+    void testGenerateChunksWithNoBreakPoints() {
+        // given
+        var sentences = List.of(Sentence.of(0, "this is"), Sentence.of(1, "a test"));
+
+        List<Integer> breakPoints = List.of();
+
+        var expectedChunks = List.of(Chunk.of(0, "this is a test"));
+
+        // when
+        var actualChunks = semanticChunker.generateChunks(sentences, breakPoints);
+
+        // then
+        assertThat(actualChunks).isEqualTo(expectedChunks);
+    }
+
     private static Stream<Arguments> provideCombineSentencesFailureScenarios() {
         final var nonEmptySentences = List.of(Sentence.of(0, "This"), Sentence.of(1, "is"));
         return Stream.of(
