@@ -1,5 +1,6 @@
-package jchunk.chunker.fixed;
+package io.jchunk.fixed;
 
+import io.jchunk.assertions.Assertions;
 import jchunk.chunker.Delimiter;
 
 /**
@@ -7,8 +8,41 @@ import jchunk.chunker.Delimiter;
  *
  * @author Pablo Sanchidrian Herrera
  */
-public record Config(
-        int chunkSize, int chunkOverlap, String delimiter, boolean trimWhitespace, Delimiter keepDelimiter) {
+public class Config {
+
+    private final int chunkSize;
+    private final int chunkOverlap;
+    private final String delimiter;
+    private final boolean trimWhitespace;
+    private final Delimiter keepDelimiter;
+
+    private Config(int chunkSize, int chunkOverlap, String delimiter, boolean trimWhitespace, Delimiter keepDelimiter) {
+        this.chunkSize = chunkSize;
+        this.chunkOverlap = chunkOverlap;
+        this.delimiter = delimiter;
+        this.trimWhitespace = trimWhitespace;
+        this.keepDelimiter = keepDelimiter;
+    }
+
+    public int getChunkSize() {
+        return chunkSize;
+    }
+
+    public int getChunkOverlap() {
+        return chunkOverlap;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public boolean getTrimWhitespace() {
+        return trimWhitespace;
+    }
+
+    public Delimiter getKeepDelimiter() {
+        return keepDelimiter;
+    }
 
     /**
      * @return the default config
@@ -59,9 +93,9 @@ public record Config(
         }
 
         public Config build() {
-            assert chunkSize > 0 : "Chunk size must be greater than 0";
-            assert chunkOverlap >= 0 : "Chunk overlap must be greater than or equal to 0";
-            assert chunkSize > chunkOverlap : "Chunk size must be greater than chunk overlap";
+            Assertions.isTrue(chunkSize > 0, "Chunk size must be greater than 0");
+            Assertions.isTrue(chunkOverlap >= 0, "Chunk overlap must be greater than or equal to 0");
+            Assertions.isTrue(chunkSize > chunkOverlap, "Chunk size must be greater than chunk overlap");
 
             return new Config(chunkSize, chunkOverlap, delimiter, trimWhitespace, keepDelimiter);
         }

@@ -1,10 +1,10 @@
-package jchunk.chunker.fixed;
+package io.jchunk.fixed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jchunk.core.chunk.Chunk;
 import java.util.List;
 import jchunk.chunker.Delimiter;
-import jchunk.chunker.core.chunk.Chunk;
 import org.junit.jupiter.api.Test;
 
 class FixedChunkerTest {
@@ -21,7 +21,7 @@ class FixedChunkerTest {
         // given
         chunker = new FixedChunker();
         List<Chunk> expectedChunks = List.of(
-                new Chunk(0, "This is the text I would like to chunk up. It is the example text for this exercise"));
+                Chunk.of(0, "This is the text I would like to chunk up. It is the example text for this exercise"));
 
         // when
         List<Chunk> chunks = chunker.split(CONTENT);
@@ -37,8 +37,8 @@ class FixedChunkerTest {
                 Config.builder().chunkSize(20).chunkOverlap(0).delimiter(".").build();
         chunker = new FixedChunker(config);
 
-        List<Chunk> expectedChunks = List.of(
-                new Chunk(0, "This is an example"), new Chunk(1, "Let's split on periods"), new Chunk(2, "Okay?"));
+        List<Chunk> expectedChunks =
+                List.of(Chunk.of(0, "This is an example"), Chunk.of(1, "Let's split on periods"), Chunk.of(2, "Okay?"));
 
         // when
         List<Chunk> chunks = chunker.split("This is an example. Let's split on periods. Okay?");
@@ -55,9 +55,9 @@ class FixedChunkerTest {
         chunker = new FixedChunker(config);
 
         List<Chunk> expectedChunks = List.of(
-                new Chunk(0, "This is the text I would like to ch"),
-                new Chunk(1, "o chunk up. It is the example text"),
-                new Chunk(2, "ext for this exercise"));
+                Chunk.of(0, "This is the text I would like to ch"),
+                Chunk.of(1, "o chunk up. It is the example text"),
+                Chunk.of(2, "ext for this exercise"));
 
         // when
         List<Chunk> chunks = chunker.split(CONTENT);
@@ -78,9 +78,9 @@ class FixedChunkerTest {
         chunker = new FixedChunker(config);
 
         List<Chunk> expectedChunks = List.of(
-                new Chunk(0, "This is the text I would like to ch"),
-                new Chunk(1, "unk up. It is the example text for "),
-                new Chunk(2, "this exercise"));
+                Chunk.of(0, "This is the text I would like to ch"),
+                Chunk.of(1, "unk up. It is the example text for "),
+                Chunk.of(2, "this exercise"));
 
         // when
         List<Chunk> chunks = chunker.split(CONTENT);
@@ -102,8 +102,8 @@ class FixedChunkerTest {
         chunker = new FixedChunker(config);
 
         List<Chunk> expectedChunks = List.of(
-                new Chunk(0, "This is the text I would like to"),
-                new Chunk(1, "unk up. It is the example text for this exercise"));
+                Chunk.of(0, "This is the text I would like to"),
+                Chunk.of(1, "unk up. It is the example text for this exercise"));
 
         // when
         List<Chunk> chunks = chunker.split(CONTENT);
