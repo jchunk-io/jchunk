@@ -47,6 +47,11 @@
             <artifactId>jchunk-core</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.jchunk</groupId>
+            <artifactId>assertions</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
         
         <!-- ONNX related -->
         <dependency>

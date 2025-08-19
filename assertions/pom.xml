@@ -7,11 +7,11 @@
         <version>0.0.2-SNAPSHOT</version>
     </parent>
     
-    <artifactId>jchunk-recursive-character</artifactId>
+    <artifactId>assertions</artifactId>
     <packaging>jar</packaging>
     
-    <name>JChunk - Recursive Character Chunker</name>
-    <description>Recursive Character Chunker for Java</description>
+    <name>JChunk - Assertions</name>
+    <description>Assertions for jchunk</description>
     <url>https://github.com/jchunk-io/jchunk</url>
     
     <licenses>
@@ -38,41 +38,17 @@
     
     <dependencies>
         <dependency>
-            <groupId>io.jchunk</groupId>
-            <artifactId>jchunk-core</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jchunk</groupId>
-            <artifactId>commons</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jchunk</groupId>
-            <artifactId>assertions</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
-        </dependency>
-        
-        <!-- test -->
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
         </dependency>
-        
     </dependencies>
     
 </project>
