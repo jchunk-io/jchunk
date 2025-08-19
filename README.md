@@ -11,6 +11,31 @@ JChunk project is simple library that enables different types of text splitting 
 
 [Click here to see documentation](docs/modules/ROOT/pages/index.adoc)
 
+## Installing
+
+```xml
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-core</artifactId>
+    <version>0.0.2</version>
+</dependency>
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-fixed</artifactId>
+    <version>0.0.2</version>
+</dependency>
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-recursive-character</artifactId>
+    <version>0.0.2</version>
+</dependency>
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-semantic</artifactId>
+    <version>0.0.2</version>
+</dependency>
+```
+
 ## Building
 
 To build with tests
