@@ -13,6 +13,8 @@ JChunk project is simple library that enables different types of text splitting 
 
 ## Installing
 
+### Maven
+
 ```xml
 <dependency>
     <groupId>io.jchunk</groupId>
@@ -34,6 +36,15 @@ JChunk project is simple library that enables different types of text splitting 
     <artifactId>jchunk-semantic</artifactId>
     <version>0.0.2</version>
 </dependency>
+```
+
+### Gradle
+
+```groovy
+implementation group: 'io.jchunk', name: 'jchunk-core', version: '0.0.2'
+implementation group: 'io.jchunk', name: 'jchunk-fixed', version: '0.0.2'
+implementation group: 'io.jchunk', name: 'jchunk-recursive-character', version: '0.0.2'
+implementation group: 'io.jchunk', name: 'jchunk-semantic', version: '0.0.2'
 ```
 
 ## Building
