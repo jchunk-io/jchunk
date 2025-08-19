@@ -50,6 +50,23 @@ class SemanticChunkerIT {
     }
 
     @Test
+    void combineSentencesUniqueSentence() {
+        // when
+        var text = "This is a example test to split.";
+        var sentences = semanticChunker.splitSentences(text, SentenceSplittingStrategy.DEFAULT);
+
+        // given
+        var combined = semanticChunker.combineSentences(sentences, 1);
+
+        // then
+        assertThat(combined)
+                .isNotNull()
+                .hasSize(1)
+                .extracting(Sentence::getContent)
+                .containsExactly(text);
+    }
+
+    @Test
     void combineSentences() {
         // when
         var sentences = semanticChunker.splitSentences(MIT_CONTENT, SentenceSplittingStrategy.DEFAULT);

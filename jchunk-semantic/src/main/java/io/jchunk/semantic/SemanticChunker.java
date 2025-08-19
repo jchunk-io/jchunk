@@ -71,6 +71,11 @@ public class SemanticChunker implements IChunker {
     List<Sentence> combineSentences(List<Sentence> sentences, Integer bufferSize) {
         assert sentences != null : "The list of sentences cannot be null";
         assert !sentences.isEmpty() : "The list of sentences cannot be empty";
+
+        if (sentences.size() == 1) { // nothing to combine
+            return sentences;
+        }
+
         assert bufferSize != null && bufferSize > 0 : "The buffer size cannot be null nor 0";
         assert bufferSize < sentences.size() : "The buffer size cannot be greater or equal than the input length";
 

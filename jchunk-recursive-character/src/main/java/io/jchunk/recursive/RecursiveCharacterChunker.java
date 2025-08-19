@@ -1,6 +1,5 @@
 package jchunk.chunker.recursive;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
