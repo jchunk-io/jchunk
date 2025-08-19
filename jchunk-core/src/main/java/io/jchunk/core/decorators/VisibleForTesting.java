@@ -1,4 +1,4 @@
-package jchunk.chunker.core.decorators;
+package io.jchunk.core.decorators;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

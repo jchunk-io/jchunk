@@ -1,4 +1,4 @@
-package jchunk.chunker.core.chunk;
+package io.jchunk.core.chunk;
 
 /**
  * The Chunk record represents a segment of content with an associated identifier and embedding.
@@ -11,28 +11,8 @@ package jchunk.chunker.core.chunk;
  */
 public record Chunk(int id, String content) {
 
-    public static Builder builder() {
-        return new Builder();
+    public static Chunk of(final int id, final String content) {
+        return new Chunk(id, content);
     }
 
-    public static class Builder {
-
-        private int id;
-
-        private String content;
-
-        public Builder id(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public Chunk build() {
-            return new Chunk(id, content);
-        }
-    }
 }

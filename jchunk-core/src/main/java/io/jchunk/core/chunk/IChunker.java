@@ -1,4 +1,4 @@
-package jchunk.chunker.core.chunk;
+package io.jchunk.core.chunk;
 
 import java.util.List;
 
