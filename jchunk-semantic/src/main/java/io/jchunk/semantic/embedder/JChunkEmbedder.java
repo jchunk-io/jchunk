@@ -1,4 +1,4 @@
-package jchunk.chunker.semantic.embedder;
+package io.jchunk.semantic.embedder;
 
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;

@@ -1,12 +1,12 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jchunk.semantic.embedder.Embedder;
+import io.jchunk.semantic.embedder.JChunkEmbedder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import jchunk.chunker.semantic.embedder.Embedder;
-import jchunk.chunker.semantic.embedder.JChunkEmbedder;
 import org.junit.jupiter.api.Test;
 
 class SemanticChunkerIT {

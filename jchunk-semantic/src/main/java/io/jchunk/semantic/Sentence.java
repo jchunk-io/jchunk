@@ -1,4 +1,4 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
 /**
  * Sentence class to represent a sentence during the splitting process
@@ -7,9 +7,9 @@ package jchunk.chunker.semantic;
  */
 public class Sentence {
 
-    private int index;
+    private final int index;
 
-    private String content;
+    private final String content;
 
     private String combined;
 
@@ -18,34 +18,28 @@ public class Sentence {
     /**
      * Constructs a Sentence
      *
-     * @param index mandatory
-     * @param content
-     * @param combined
-     * @param embedding
+     * @param index index to identify sentence position
+     * @param content sentence content
      *
      * @implNote by default, combined is set to content if combined is null
      */
-    private Sentence(int index, String content, String combined, float[] embedding) {
+    private Sentence(int index, String content) {
         this.index = index;
         this.content = content;
-        this.combined = combined != null ? combined : content;
-        this.embedding = embedding;
+        this.combined = content;
+        this.embedding = new float[0];
+    }
+
+    public static Sentence of(final int index, final String content) {
+        return new Sentence(index, content);
     }
 
     public int getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
     public String getContent() {
         return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getCombined() {
@@ -64,42 +58,30 @@ public class Sentence {
         this.embedding = embedding;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(final int index, final String content) {
+        return new Builder(index, content);
     }
 
     public static class Builder {
 
-        private Integer index;
-        private String content;
-        private String combined;
-        private float[] embedding = new float[] {};
+        private final Sentence sentence;
 
-        public Builder index(final int index) {
-            this.index = index;
-            return this;
-        }
-
-        public Builder content(final String content) {
-            this.content = content;
-            return this;
+        public Builder(final int index, final String content) {
+            this.sentence = Sentence.of(index, content);
         }
 
         public Builder combined(final String combined) {
-            this.combined = combined;
+            this.sentence.setCombined(combined);
             return this;
         }
 
         public Builder embedding(final float[] embedding) {
-            this.embedding = embedding;
+            this.sentence.setEmbedding(embedding);
             return this;
         }
 
         public Sentence build() {
-            assert index != null : "sentence must have an index";
-            assert content != null : "sentence must have a content";
-
-            return new Sentence(index, content, combined, embedding);
+            return this.sentence;
         }
     }
 }

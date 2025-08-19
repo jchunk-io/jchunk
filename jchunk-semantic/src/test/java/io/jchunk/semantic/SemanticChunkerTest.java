@@ -1,13 +1,13 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.semantic.embedder.Embedder;
 import java.util.List;
 import java.util.stream.Stream;
-import jchunk.chunker.core.chunk.Chunk;
-import jchunk.chunker.semantic.embedder.Embedder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,12 +33,10 @@ class SemanticChunkerTest {
     void splitSentenceDefaultStrategyTest() {
         // given
         var expectedResult = List.of(
-                Sentence.builder().content("This is a test sentence.").build(),
-                Sentence.builder().content("How are u?").build(),
-                Sentence.builder()
-                        .content("I am fine thanks\nI am a test sentence!")
-                        .build(),
-                Sentence.builder().content("sure").build());
+                Sentence.of(0, "This is a test sentence."),
+                Sentence.of(1, "How are u?"),
+                Sentence.of(2, "I am fine thanks\nI am a test sentence!"),
+                Sentence.of(3, "sure"));
 
         var content = "This is a test sentence. How are u? I am fine thanks\nI am a test sentence! sure";
 
@@ -58,10 +56,8 @@ class SemanticChunkerTest {
     void splitSentenceStrategyTest() {
         // given
         var expectedResult = List.of(
-                Sentence.builder()
-                        .content("This is a test sentence. How are u? I am fine thanks")
-                        .build(),
-                Sentence.builder().content("I am a test sentence! sure").build());
+                Sentence.of(0, "This is a test sentence. How are u? I am fine thanks"),
+                Sentence.of(1, "I am a test sentence! sure"));
 
         var content = "This is a test sentence. How are u? I am fine thanks\nI am a test sentence! sure";
 
@@ -69,7 +65,7 @@ class SemanticChunkerTest {
         List<Sentence> result = semanticChunker.splitSentences(content, SentenceSplittingStrategy.LINE_BREAK);
 
         // then
-        assertThat(result).isNotNull().hasSize(expectedResult.size());
+        assertThat(result).isNotNull().hasSameSizeAs(expectedResult);
 
         assertThat(result.get(0).getContent()).isEqualTo(expectedResult.get(0).getContent());
         assertThat(result.get(1).getContent()).isEqualTo(expectedResult.get(1).getContent());
@@ -79,15 +75,9 @@ class SemanticChunkerTest {
     void splitSentenceParagraphStrategyTest() {
         // given
         var expectedResult = List.of(
-                Sentence.builder().index(0).content("This is a test sentence.").build(),
-                Sentence.builder()
-                        .index(1)
-                        .content("How are u? I am fine thanks")
-                        .build(),
-                Sentence.builder()
-                        .index(2)
-                        .content("I am a test sentence!\nsure")
-                        .build());
+                Sentence.of(0, "This is a test sentence."),
+                Sentence.of(1, "How are u? I am fine thanks"),
+                Sentence.of(2, "I am a test sentence!\nsure"));
 
         var content = "This is a test sentence.\n\nHow are u? I am fine thanks\n\nI am a test sentence!\nsure";
 
@@ -95,7 +85,7 @@ class SemanticChunkerTest {
         var result = semanticChunker.splitSentences(content, SentenceSplittingStrategy.PARAGRAPH);
 
         // then
-        assertThat(result).isNotNull().hasSize(expectedResult.size());
+        assertThat(result).isNotNull().hasSameSizeAs(expectedResult);
 
         assertThat(result.get(0).getContent()).isEqualTo(expectedResult.get(0).getContent());
         assertThat(result.get(1).getContent()).isEqualTo(expectedResult.get(1).getContent());
@@ -107,50 +97,24 @@ class SemanticChunkerTest {
         // given
         var bufferSize = 2;
         var input = List.of(
-                Sentence.builder().index(0).content("This").build(),
-                Sentence.builder().index(1).content("is").build(),
-                Sentence.builder().index(2).content("a").build(),
-                Sentence.builder().index(3).content("sentence").build(),
-                Sentence.builder().index(4).content("for").build(),
-                Sentence.builder().index(5).content("you").build(),
-                Sentence.builder().index(6).content("mate").build());
+                Sentence.of(0, "This"),
+                Sentence.of(1, "is"),
+                Sentence.of(2, "a"),
+                Sentence.of(3, "sentence"),
+                Sentence.of(4, "for"),
+                Sentence.of(5, "you"),
+                Sentence.of(6, "mate"));
 
         var expectedResult = List.of(
-                Sentence.builder()
-                        .index(0)
-                        .content("This")
-                        .combined("This is a")
-                        .build(),
-                Sentence.builder()
-                        .index(1)
-                        .content("is")
-                        .combined("This is a sentence")
-                        .build(),
-                Sentence.builder()
-                        .index(2)
-                        .content("a")
-                        .combined("This is a sentence for")
-                        .build(),
-                Sentence.builder()
-                        .index(3)
-                        .content("sentence")
+                Sentence.builder(0, "This").combined("This is a").build(),
+                Sentence.builder(1, "is").combined("This is a sentence").build(),
+                Sentence.builder(2, "a").combined("This is a sentence for").build(),
+                Sentence.builder(3, "sentence")
                         .combined("is a sentence for you")
                         .build(),
-                Sentence.builder()
-                        .index(4)
-                        .content("for")
-                        .combined("a sentence for you mate")
-                        .build(),
-                Sentence.builder()
-                        .index(5)
-                        .content("you")
-                        .combined("sentence for you mate")
-                        .build(),
-                Sentence.builder()
-                        .index(6)
-                        .content("mate")
-                        .combined("for you mate")
-                        .build());
+                Sentence.builder(4, "for").combined("a sentence for you mate").build(),
+                Sentence.builder(5, "you").combined("sentence for you mate").build(),
+                Sentence.builder(6, "mate").combined("for you mate").build());
 
         // when
         var result = semanticChunker.combineSentences(input, bufferSize);
@@ -171,7 +135,7 @@ class SemanticChunkerTest {
     @MethodSource("provideCombineSentencesFailureScenarios")
     void combineSentencesFailureScenariosTest(List<Sentence> sentences, Integer bufferSize, String expectedMsg) {
         assertThatThrownBy(() -> semanticChunker.combineSentences(sentences, bufferSize))
-                .isInstanceOf(AssertionError.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMsg);
     }
 
@@ -182,15 +146,15 @@ class SemanticChunkerTest {
                 .thenReturn(List.of(new float[] {1.0f, 2.0f, 3.0f}, new float[] {4.0f, 5.0f, 6.0f}));
 
         var sentences = List.of(
-                Sentence.builder().combined("This is a test sentence.").build(),
-                Sentence.builder().combined("How are u?").build());
+                Sentence.builder(0, "").combined("This is a test sentence.").build(),
+                Sentence.builder(0, "").combined("How are u?").build());
 
         var expectedResult = List.of(
-                Sentence.builder()
+                Sentence.builder(0, "")
                         .combined("This is a test sentence.")
                         .embedding(new float[] {1.0f, 2.0f, 3.0f})
                         .build(),
-                Sentence.builder()
+                Sentence.builder(0, "")
                         .combined("How are u?")
                         .embedding(new float[] {4.0f, 5.0f, 6.0f})
                         .build());
@@ -251,15 +215,15 @@ class SemanticChunkerTest {
     void testGenerateChunks() {
         // given
         var sentences = List.of(
-                Sentence.builder().index(0).content("This").build(),
-                Sentence.builder().index(1).content("is").build(),
-                Sentence.builder().index(2).content("a").build(),
-                Sentence.builder().index(3).content("test.").build(),
-                Sentence.builder().index(4).content("We").build(),
-                Sentence.builder().index(5).content("are").build(),
-                Sentence.builder().index(6).content("writing").build(),
-                Sentence.builder().index(7).content("unit").build(),
-                Sentence.builder().index(8).content("tests.").build());
+                Sentence.of(0, "This"),
+                Sentence.of(1, "is"),
+                Sentence.of(2, "a"),
+                Sentence.of(3, "test."),
+                Sentence.of(4, "We"),
+                Sentence.of(5, "are"),
+                Sentence.of(6, "writing"),
+                Sentence.of(7, "unit"),
+                Sentence.of(8, "tests."));
 
         var breakPoints = List.of(2, 4, 6);
 
@@ -283,11 +247,11 @@ class SemanticChunkerTest {
     }
 
     private static Stream<Arguments> provideCombineSentencesFailureScenarios() {
-        final var nonEmptySentences = List.of(Sentence.builder().content("This").build());
+        final var nonEmptySentences = List.of(Sentence.of(0, "This"), Sentence.of(1, "is"));
         return Stream.of(
-                Arguments.of(nonEmptySentences, 0, "The buffer size cannot be null nor 0"),
-                Arguments.of(nonEmptySentences, null, "The buffer size cannot be null nor 0"),
-                Arguments.of(nonEmptySentences, 1, "The buffer size cannot be greater or equal than the input length"),
+                Arguments.of(nonEmptySentences, 0, "The buffer size must be greater than 0"),
+                Arguments.of(nonEmptySentences, null, "The buffer size cannot be null"),
+                Arguments.of(nonEmptySentences, 2, "The buffer size must be smaller than the sentences size"),
                 Arguments.of(null, 2, "The list of sentences cannot be null"),
                 Arguments.of(List.of(), 2, "The list of sentences cannot be empty"));
     }

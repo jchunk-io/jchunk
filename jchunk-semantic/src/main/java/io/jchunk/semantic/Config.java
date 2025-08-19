@@ -1,4 +1,4 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
 /**
  * Configuration for the semantic chunker

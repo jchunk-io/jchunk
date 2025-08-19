@@ -1,14 +1,15 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
+import io.jchunk.assertions.Assertions;
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.core.chunk.IChunker;
+import io.jchunk.core.decorators.VisibleForTesting;
+import io.jchunk.semantic.embedder.Embedder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import jchunk.chunker.core.chunk.Chunk;
-import jchunk.chunker.core.chunk.IChunker;
-import jchunk.chunker.core.decorators.VisibleForTesting;
-import jchunk.chunker.semantic.embedder.Embedder;
 
 /**
  * A semantic chunker that chunks the content based on the semantic meaning
@@ -50,10 +51,7 @@ public class SemanticChunker implements IChunker {
     List<Sentence> splitSentences(String content, SentenceSplittingStrategy splittingStrategy) {
         var index = new AtomicInteger(0);
         return Arrays.stream(content.split(splittingStrategy.getStrategy()))
-                .map(sentence -> Sentence.builder()
-                        .content(sentence)
-                        .index(index.getAndIncrement())
-                        .build())
+                .map(sentence -> Sentence.of(index.getAndIncrement(), sentence))
                 .toList();
     }
 
@@ -69,15 +67,16 @@ public class SemanticChunker implements IChunker {
      */
     @VisibleForTesting
     List<Sentence> combineSentences(List<Sentence> sentences, Integer bufferSize) {
-        assert sentences != null : "The list of sentences cannot be null";
-        assert !sentences.isEmpty() : "The list of sentences cannot be empty";
+        Assertions.notNull(sentences, "The list of sentences cannot be null");
+        Assertions.notEmpty(sentences, "The list of sentences cannot be empty");
 
-        if (sentences.size() == 1) { // nothing to combine
+        if (sentences.size() <= 1) { // nothing to combine
             return sentences;
         }
 
-        assert bufferSize != null && bufferSize > 0 : "The buffer size cannot be null nor 0";
-        assert bufferSize < sentences.size() : "The buffer size cannot be greater or equal than the input length";
+        Assertions.notNull(bufferSize, "The buffer size cannot be null");
+        Assertions.isTrue(bufferSize > 0, "The buffer size must be greater than 0");
+        Assertions.isTrue(bufferSize < sentences.size(), "The buffer size must be smaller than the sentences size");
 
         var n = sentences.size();
         var windowSize = bufferSize * 2 + 1;
@@ -144,9 +143,9 @@ public class SemanticChunker implements IChunker {
      */
     @VisibleForTesting
     double cosineSimilarity(final float[] sentence1, final float[] sentence2) {
-        assert sentence1 != null : "The first sentence embedding cannot be null";
-        assert sentence2 != null : "The second sentence embedding cannot be null";
-        assert sentence1.length == sentence2.length : "The sentence embeddings must have the same size";
+        Assertions.notNull(sentence1, "The first sentence embedding cannot be null");
+        Assertions.notNull(sentence2, "The second sentence embedding cannot be null");
+        Assertions.isTrue(sentence1.length == sentence2.length, "The sentence embeddings must have the same size");
 
         double dotProduct = 0.0;
         double sentence1Norm = 0.0;
@@ -186,7 +185,7 @@ public class SemanticChunker implements IChunker {
      */
     @VisibleForTesting
     List<Integer> calculateBreakPoints(final List<Double> distances, final int percentile) {
-        assert distances != null : "The list of distances cannot be null";
+        Assertions.notNull(distances, "The list of distances cannot be null");
 
         var breakpointDistanceThreshold = calculatePercentile(distances, percentile);
 
@@ -197,8 +196,9 @@ public class SemanticChunker implements IChunker {
     }
 
     private static Double calculatePercentile(final List<Double> distances, final int percentile) {
-        assert distances != null : "The list of distances cannot be null";
-        assert percentile > 0 && percentile < 100 : "The percentile must be greater than 0 and less than 100";
+        Assertions.notNull(distances, "The list of distances cannot be null");
+        Assertions.isTrue(
+                percentile > 0 && percentile < 100, "The percentile must be greater than 0 and less than 100");
 
         var sortedDistances = distances.stream().sorted().toList();
 
@@ -215,9 +215,9 @@ public class SemanticChunker implements IChunker {
      */
     @VisibleForTesting
     List<Chunk> generateChunks(final List<Sentence> sentences, final List<Integer> breakPoints) {
-        assert sentences != null : "The list of sentences cannot be null";
-        assert !sentences.isEmpty() : "The list of sentences cannot be empty";
-        assert breakPoints != null : "The list of break points cannot be null";
+        Assertions.notNull(sentences, "The list of sentences cannot be null");
+        Assertions.notEmpty(sentences, "The list of sentences cannot be empty");
+        Assertions.notNull(breakPoints, "The list of break points cannot be null");
 
         var index = new AtomicInteger(0);
 

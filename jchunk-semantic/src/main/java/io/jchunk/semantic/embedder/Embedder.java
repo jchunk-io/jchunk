@@ -1,4 +1,4 @@
-package jchunk.chunker.semantic.embedder;
+package io.jchunk.semantic.embedder;
 
 import java.util.List;
 

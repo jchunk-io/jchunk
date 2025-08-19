@@ -1,4 +1,4 @@
-package jchunk.chunker.semantic;
+package io.jchunk.semantic;
 
 /**
  * Enum to represent the different strategies to split the sentences
