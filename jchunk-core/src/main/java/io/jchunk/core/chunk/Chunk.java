@@ -14,5 +14,4 @@ public record Chunk(int id, String content) {
     public static Chunk of(final int id, final String content) {
         return new Chunk(id, content);
     }
-
 }

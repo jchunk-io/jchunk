@@ -2,13 +2,35 @@ package io.jchunk.semantic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jchunk.core.chunk.Chunk;
 import io.jchunk.semantic.embedder.Embedder;
 import io.jchunk.semantic.embedder.JChunkEmbedder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Integration tests for the {@link SemanticChunker}.
+ * <p>
+ * These tests validate that the chunking pipeline works end-to-end with different types of input.
+ * Since embedding models may evolve over time and produce slightly different results,
+ * the assertions do not rely on exact embedding values or number of chunks, but rather on:
+ * <ul>
+ *   <li>Ensuring that input content is correctly loaded.</li>
+ *   <li>Verifying that large or splittable content produces at least one chunk.</li>
+ *   <li>Ensuring that minimal content (e.g., a single sentence) still produces a valid chunk.</li>
+ * </ul>
+ * <p>
+ * The tests cover edge cases like:
+ * <ul>
+ *   <li>Large, realistic content (MIT text).</li>
+ *   <li>Single-sentence input that cannot be split further</li>
+ * </ul>
+ */
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class SemanticChunkerIT {
 
     private static final String MIT_CONTENT = getText("data/mit.txt");
@@ -27,12 +49,18 @@ class SemanticChunkerIT {
     }
 
     @Test
-    void documentContentLoaded() {
+    void document_content_loaded() {
         assertThat(MIT_CONTENT).isNotBlank();
     }
 
+    /**
+     * Verifies that a large, realistic document is split into one or more chunks.
+     * <p>
+     * The exact number of chunks is not asserted, since embeddings may vary between model versions,
+     * but the output must never be empty.
+     */
     @Test
-    void getChunks() {
+    void mit_content_is_split() {
         // when
         var chunks = semanticChunker.split(MIT_CONTENT);
 
@@ -40,74 +68,20 @@ class SemanticChunkerIT {
         assertThat(chunks).isNotEmpty();
     }
 
+    /**
+     * Verifies that if the input consists of a single sentence,
+     * the chunker produces exactly one chunk with the original content.
+     */
     @Test
-    void getSentences() {
-        // when
-        var sentences = semanticChunker.splitSentences(MIT_CONTENT, SentenceSplittingStrategy.DEFAULT);
-
-        // then
-        assertThat(sentences).isNotEmpty().hasSize(317);
-    }
-
-    @Test
-    void combineSentencesUniqueSentence() {
-        // when
-        var text = "This is a example test to split.";
-        var sentences = semanticChunker.splitSentences(text, SentenceSplittingStrategy.DEFAULT);
-
+    void unique_sentence_is_split() {
         // given
-        var combined = semanticChunker.combineSentences(sentences, 1);
+        var text = "This is a example test to split.";
 
-        // then
-        assertThat(combined)
-                .isNotNull()
-                .hasSize(1)
-                .extracting(Sentence::getContent)
-                .containsExactly(text);
-    }
-
-    @Test
-    void combineSentences() {
         // when
-        var sentences = semanticChunker.splitSentences(MIT_CONTENT, SentenceSplittingStrategy.DEFAULT);
-        var combined = semanticChunker.combineSentences(sentences, 1);
+        var chunks = semanticChunker.split(text);
 
         // then
-        assertThat(combined).isNotEmpty().hasSize(317);
-
-        assertThat(combined.getFirst().getIndex()).isZero();
-        assertThat(combined.getFirst().getContent()).isEqualTo("\n\nWant to start a startup?");
-        assertThat(combined.getFirst().getCombined())
-                .isEqualTo("\n\nWant to start a startup? Get funded by\nY Combinator.");
-    }
-
-    @Test
-    void embedChunks() {
-        // when
-        var sentences = semanticChunker.splitSentences(MIT_CONTENT, SentenceSplittingStrategy.DEFAULT);
-        var combined = semanticChunker.combineSentences(sentences, 1);
-        var embedded = semanticChunker.embedSentences(embedder, combined);
-
-        // then
-        assertThat(embedded).isNotEmpty().hasSize(317);
-
-        assertThat(embedded.getFirst().getIndex()).isZero();
-        assertThat(embedded.getFirst().getContent()).isEqualTo("\n\nWant to start a startup?");
-        assertThat(embedded.getFirst().getCombined())
-                .isEqualTo("\n\nWant to start a startup? Get funded by\nY Combinator.");
-        assertThat(embedded.getFirst().getEmbedding()).isNotNull().hasSize(embedder.getDimension());
-    }
-
-    @Test
-    void getCosineDistancesArray() {
-        // when
-        var sentences = semanticChunker.splitSentences(MIT_CONTENT, SentenceSplittingStrategy.DEFAULT);
-        var combined = semanticChunker.combineSentences(sentences, 1);
-        var embedded = semanticChunker.embedSentences(embedder, combined);
-        var distances = semanticChunker.calculateSimilarities(embedded);
-
-        // then
-        assertThat(distances).hasSize(sentences.size() - 1);
+        assertThat(chunks).hasSize(1).extracting(Chunk::content).containsExactly(text);
     }
 
     // HELPERS

@@ -123,6 +123,12 @@ public class RecursiveCharacterChunker implements IChunker {
             return content.chars().mapToObj(c -> String.valueOf((char) c)).toList();
         }
 
+        if (config.getKeepDelimiter() == Delimiter.NONE) {
+            return Arrays.stream(content.split(delimiter))
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+        }
+
         String withDelimiter = "((?<=%1$s)|(?=%1$s))";
         List<String> preSplits = new ArrayList<>(List.of(content.split(String.format(withDelimiter, delimiter))));
 

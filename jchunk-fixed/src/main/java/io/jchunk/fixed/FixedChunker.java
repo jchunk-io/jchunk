@@ -5,7 +5,6 @@ import io.jchunk.core.chunk.IChunker;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import jchunk.chunker.Delimiter;
 
@@ -67,7 +66,7 @@ public class FixedChunker implements IChunker {
     private List<String> splitWithDelimiter(String content, String delimiter, Delimiter keepDelimiter) {
 
         if (keepDelimiter == Delimiter.NONE) {
-            return Arrays.stream(content.split(Pattern.quote(delimiter)))
+            return Arrays.stream(content.split(delimiter))
                     .filter(s -> !s.isEmpty())
                     .toList();
         }
