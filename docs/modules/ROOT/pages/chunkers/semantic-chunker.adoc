@@ -5,6 +5,65 @@
 
 The Semantic Chunker uses AI embeddings to split text based on semantic relationships rather than fixed character counts. This approach is ideal for retrieval-augmented generation (RAG) applications where context preservation is crucial.
 
+== Installation
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-semantic</artifactId>
+    <version>${jchunk.version}</version>
+</dependency>
+----
+
+[source,groovy]
+----
+implementation group: 'io.jchunk', name: 'jchunk-semantic', version: "${JCHUNK_VERSION}"
+----
+
+== Configuration
+
+[source,java]
+----
+// using default config
+SemanticChunker chunker = new SemanticChunker(new JChunkEmbedder());
+
+// with custom config
+Config config = Config.builder()
+        .sentenceSplittingStrategy(SentenceSplittingStrategy.DEFAULT) // regex for splitting sentences
+        .percentile(90)                                               // similarity threshold (1–99)
+        .bufferSize(2)                                                // number of neighbors for context
+        .build();
+
+SemanticChunker chunker = new SemanticChunker(new JChunkEmbedder(), config);
+----
+
+=== Configuration Options
+
+[cols="1,2,3", options="header"]
+|===
+| Option | Description | Default
+
+| `sentenceSplittingRegex`
+| Regex used to split text into sentences.
+Can be provided directly or via a `SentenceSplittingStrategy`.
+| `SentenceSplittingStrategy.DEFAULT`
+
+| `percentile`
+| Percentile threshold (1–99) applied to cosine distance scores to determine breakpoints.
+
+Higher values then fewer and larger chunks.
+
+Lower values then more and smaller chunks.
+| `95`
+
+| `bufferSize`
+| Number of neighboring sentences to include on each side when creating the context window.
+Must be > 0.
+| `1`
+|===
+
+
 == How It Works
 
 === Sentence Splitting
