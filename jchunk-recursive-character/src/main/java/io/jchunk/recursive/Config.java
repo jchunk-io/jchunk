@@ -80,7 +80,7 @@ public class Config {
             return this;
         }
 
-        public Builder separators(List<String> delimiters) {
+        public Builder delimiters(List<String> delimiters) {
             this.delimiters = delimiters;
             return this;
         }
