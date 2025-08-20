@@ -1,12 +1,12 @@
 package io.jchunk.fixed;
 
+import io.jchunk.commons.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
-import jchunk.chunker.Delimiter;
 
 /**
  * {@code FixedChunker} implements {@link IChunker} by splitting text into

@@ -1,5 +1,6 @@
 package io.jchunk.recursive;
 
+import io.jchunk.commons.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
 import java.util.*;
@@ -7,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import jchunk.chunker.Delimiter;
 
 /**
  * Recursive, delimiter-aware chunker.
