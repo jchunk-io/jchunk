@@ -9,7 +9,13 @@ JChunk project is simple library that enables different types of text splitting 
 
 ## Docs
 
-[Click here to see documentation](docs/modules/ROOT/pages/index.adoc)
+### Chunkers
+ - [Fixed Chunker](jchunk-fixed/README.md)
+ - [Recursive Character Chunker](jchunk-recursive-character/README.md)
+ - [Semantic Chunker](jchunk-semantic/README.md)
+
+### More
+ - [Jchunk Documentation](docs/modules/ROOT/pages/index.adoc)
 
 ## Installing
 
@@ -18,33 +24,15 @@ JChunk project is simple library that enables different types of text splitting 
 ```xml
 <dependency>
     <groupId>io.jchunk</groupId>
-    <artifactId>jchunk-core</artifactId>
-    <version>0.0.2</version>
-</dependency>
-<dependency>
-    <groupId>io.jchunk</groupId>
-    <artifactId>jchunk-fixed</artifactId>
-    <version>0.0.2</version>
-</dependency>
-<dependency>
-    <groupId>io.jchunk</groupId>
-    <artifactId>jchunk-recursive-character</artifactId>
-    <version>0.0.2</version>
-</dependency>
-<dependency>
-    <groupId>io.jchunk</groupId>
-    <artifactId>jchunk-semantic</artifactId>
-    <version>0.0.2</version>
+    <artifactId>jchunk-...</artifactId> <!-- replace dots with desired module name -->
+    <version>${jchunk.version}</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation group: 'io.jchunk', name: 'jchunk-core', version: '0.0.2'
-implementation group: 'io.jchunk', name: 'jchunk-fixed', version: '0.0.2'
-implementation group: 'io.jchunk', name: 'jchunk-recursive-character', version: '0.0.2'
-implementation group: 'io.jchunk', name: 'jchunk-semantic', version: '0.0.2'
+implementation group: 'io.jchunk', name: 'jchunk-...', version: "${JCHUNK_VERSION}" // replace dots with desired module name
 ```
 
 ## Building
