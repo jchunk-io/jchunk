@@ -4,7 +4,32 @@ import io.jchunk.assertions.Assertions;
 import jchunk.chunker.Delimiter;
 
 /**
- * Configuration for the fixed chunker
+ * Configuration for a fixed-size, delimiter-aware chunker.
+ * <p>
+ * Defines how text should be split into chunks, including:
+ * <ul>
+ *   <li>{@code chunkSize} - maximum size (in characters) of each chunk.</li>
+ *   <li>{@code chunkOverlap} – number of characters to overlap between consecutive chunks.</li>
+ *   <li>{@code delimiter} - delimiter defined as regex-string used to split the content.</li>
+ *   <li>{@code keepDelimiter} – policy defining whether to keep delimiters at the start or end of a chunk.</li>
+ *   <li>{@code trimWhiteSpace} – whether leading and trailing whitespace should be removed from chunks.</li>
+ * </ul>
+ * <p>
+ * Instances are immutable and must be created via {@link Builder} or the convenience
+ * method {@link #defaultConfig()}.
+ *
+ * <pre>{@code
+ * Config cfg = Config.builder()
+ *     .chunkSize(1000)
+ *     .chunkOverlap(100)
+ *     .delimiter("\\.") // dot
+ *     .keepDelimiter(Delimiter.NONE)
+ *     .trimWhitespace(true)
+ *     .build();
+ * }</pre>
+ *
+ * @see FixedChunker
+ * @see Delimiter
  *
  * @author Pablo Sanchidrian Herrera
  */
