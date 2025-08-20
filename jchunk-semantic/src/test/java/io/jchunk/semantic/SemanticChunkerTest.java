@@ -44,7 +44,8 @@ class SemanticChunkerTest {
         var content = "This is a test sentence. How are u? I am fine thanks\nI am a test sentence! sure";
 
         // when
-        List<Sentence> result = semanticChunker.splitSentences(content, SentenceSplittingStrategy.DEFAULT);
+        var defaultStrategy = SentenceSplittingStrategy.DEFAULT.getStrategy();
+        List<Sentence> result = semanticChunker.splitSentences(content, defaultStrategy);
 
         // then
         assertThat(result).isNotNull().hasSize(expectedResult.size());
@@ -65,7 +66,8 @@ class SemanticChunkerTest {
         var content = "This is a test sentence. How are u? I am fine thanks\nI am a test sentence! sure";
 
         // when
-        List<Sentence> result = semanticChunker.splitSentences(content, SentenceSplittingStrategy.LINE_BREAK);
+        var lineBreakStrategy = SentenceSplittingStrategy.LINE_BREAK.getStrategy();
+        List<Sentence> result = semanticChunker.splitSentences(content, lineBreakStrategy);
 
         // then
         assertThat(result).isNotNull().hasSameSizeAs(expectedResult);
@@ -85,7 +87,8 @@ class SemanticChunkerTest {
         var content = "This is a test sentence.\n\nHow are u? I am fine thanks\n\nI am a test sentence!\nsure";
 
         // when
-        var result = semanticChunker.splitSentences(content, SentenceSplittingStrategy.PARAGRAPH);
+        var paragraphStrategy = SentenceSplittingStrategy.PARAGRAPH.getStrategy();
+        var result = semanticChunker.splitSentences(content, paragraphStrategy);
 
         // then
         assertThat(result).isNotNull().hasSameSizeAs(expectedResult);

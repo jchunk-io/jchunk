@@ -1,12 +1,37 @@
 package io.jchunk.recursive;
 
 import io.jchunk.assertions.Assertions;
+import io.jchunk.commons.Delimiter;
 import java.util.ArrayList;
 import java.util.List;
-import jchunk.chunker.Delimiter;
 
 /**
- * {@link Config} is a class that holds the configuration for the {@link RecursiveCharacterChunker}.
+ * Configuration object for the {@link RecursiveCharacterChunker}.
+ * <p>
+ * Defines how text should be split into chunks, including:
+ * <ul>
+ *   <li>{@code chunkSize} – maximum size (in characters) of each chunk.</li>
+ *   <li>{@code chunkOverlap} – number of characters to overlap between consecutive chunks.</li>
+ *   <li>{@code delimiters} – list of delimiter <b>regex-strings</b> used to split the text hierarchically (e.g. paragraphs, newlines, spaces).</li>
+ *   <li>{@code keepDelimiter} – policy defining whether to keep delimiters at the start or end of a chunk.</li>
+ *   <li>{@code trimWhiteSpace} – whether leading and trailing whitespace should be removed from chunks.</li>
+ * </ul>
+ * <p>
+ * Instances are immutable and must be created via {@link Builder} or the convenience
+ * method {@link #defaultConfig()}.
+ *
+ * <pre>{@code
+ * // Example usage:
+ * Config config = Config.builder()
+ *     .chunkSize(200)
+ *     .chunkOverlap(40)
+ *     .keepDelimiter(Delimiter.END)
+ *     .trimWhitespace(true)
+ *     .build();
+ * }</pre>
+ *
+ * @see RecursiveCharacterChunker
+ * @see Delimiter
  *
  * @author Pablo Sanchidrian Herrera
  */

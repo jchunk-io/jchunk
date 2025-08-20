@@ -1,15 +1,48 @@
 package io.jchunk.fixed;
 
+import io.jchunk.commons.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
-import jchunk.chunker.Delimiter;
 
 /**
- * {@link FixedChunker} is a chunker that splits the content into fixed size chunks.
+ * {@code FixedChunker} implements {@link IChunker} by splitting text into
+ * fixed-size chunks based on a single delimiter.
+ *
+ * <p>It processes input by:
+ * <ul>
+ *   <li>Splitting the text into sentences/fragments using the configured delimiter
+ *       (with optional retention of the delimiter at the start, end, or not at all).</li>
+ *   <li>Merging those fragments into chunks that are approximately
+ *       {@link Config#getChunkSize()} characters long.</li>
+ *   <li>Ensuring an overlap of {@link Config#getChunkOverlap()} characters between
+ *       consecutive chunks.</li>
+ *   <li>Optionally trimming leading/trailing whitespace from each chunk.</li>
+ * </ul>
+ *
+ * <p>If a chunk exceeds the configured maximum size because it cannot be split further,
+ * a warning is logged.
+ * <p>
+ * Example:
+ * <pre>{@code
+ * Config cfg = Config.builder()
+ *     .chunkSize(1000)
+ *     .chunkOverlap(100)
+ *     .delimiter(" ")
+ *     .keepDelimiter(Delimiter.NONE)
+ *     .trimWhitespace(true)
+ *     .build();
+ *
+ * IChunker chunker = new FixedChunker(cfg);
+ * List<Chunk> chunks = chunker.split("Your text here...");
+ * }</pre>
+ *
+ * @see Config
+ * @see Delimiter
+ * @see Chunk
  *
  * @author Pablo Sanchidrian Herrera
  */
@@ -39,8 +72,8 @@ public class FixedChunker implements IChunker {
     /**
      * Splits the content into sentences using the delimiter.
      *
-     * @param content the content to split
-     * @param config configuration for the chunker/splitter
+     * @param content   the content to split
+     * @param config    configuration for the chunker/splitter
      * @return a list of split sentences
      */
     public List<String> splitIntoSentences(String content, Config config) {
@@ -57,8 +90,8 @@ public class FixedChunker implements IChunker {
     /**
      * Splits the content into sentences using the delimiter.
      *
-     * @param content the content to split
-     * @param delimiter the delimiter to split the content.
+     * @param content       the content to split
+     * @param delimiter     the delimiter to split the content.
      * @param keepDelimiter whether to keep the delimiter at the start or end of the sentence or not.
      *     {@link Delimiter}
      * @return a list of split sentences
@@ -117,7 +150,7 @@ public class FixedChunker implements IChunker {
      * Merges the sentences into chunks.
      *
      * @param sentences the sentences to merge
-     * @param config configuration for the chunker/splitter
+     * @param config    configuration for the chunker/splitter
      * @return list of chunks
      */
     private List<Chunk> mergeSentences(List<String> sentences, Config config) {
@@ -163,10 +196,10 @@ public class FixedChunker implements IChunker {
     /**
      * Adds the chunk to the list of chunks.
      *
-     * @param chunks the list of chunks
-     * @param currentChunk the current chunk
-     * @param delimiter the delimiter
-     * @param trimWhitespace whether to trim the whitespace
+     * @param chunks            the list of chunks
+     * @param currentChunk      the current chunk
+     * @param delimiter         the delimiter
+     * @param trimWhitespace    whether to trim the whitespace
      * @param index the index of the chunk
      */
     private void addChunk(
@@ -183,10 +216,10 @@ public class FixedChunker implements IChunker {
     /**
      * Adjusts the current chunk for overlap.
      *
-     * @param currentChunk the current chunk
-     * @param currentLen the current length of the chunk
-     * @param chunkOverlap the overlap between chunks
-     * @param delimiterLen the length of the delimiter
+     * @param currentChunk  the current chunk
+     * @param currentLen    the current length of the chunk
+     * @param chunkOverlap  the overlap between chunks
+     * @param delimiterLen  the length of the delimiter
      * @return the adjusted length of the chunk
      */
     private int adjustCurrentChunkForOverlap(
@@ -200,9 +233,9 @@ public class FixedChunker implements IChunker {
     /**
      * Joins the sentences into a single sentence.
      *
-     * @param sentences the sentences to join
-     * @param delimiter the delimiter to join the sentences
-     * @param trimWhitespace whether to trim the whitespace
+     * @param sentences         the sentences to join
+     * @param delimiter         the delimiter to join the sentences
+     * @param trimWhitespace    whether to trim the whitespace
      * @return the generated sentence
      */
     private String joinSentences(Deque<String> sentences, String delimiter, boolean trimWhitespace) {

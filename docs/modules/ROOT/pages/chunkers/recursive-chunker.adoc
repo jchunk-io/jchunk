@@ -5,6 +5,23 @@
 
 The Recursive Character Chunker provides more intelligent text splitting by using a hierarchy of separators. It attempts to split on the most meaningful separators first, falling back to less meaningful ones if needed.
 
+== Installation
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-recursive-character</artifactId>
+    <version>${jchunk.version}</version>
+</dependency>
+----
+
+[source,groovy]
+----
+implementation group: 'io.jchunk', name: 'jchunk-recursive-character', version: "${JCHUNK_VERSION}"
+----
+
+
 == Configuration
 
 [source,java]
@@ -24,7 +41,40 @@ Config config = Config.builder()
 RecursiveCharacterChunker chunker = new RecursiveCharacterChunker();
 ----
 
-== Default Separators
+=== Configuration Options
+
+[cols="1,2,3", options="header"]
+|===
+| Option | Description | Default
+
+| `chunkSize`
+| Maximum number of characters per chunk.
+Chunks may exceed this limit if the text cannot be split further.
+| `100`
+
+| `chunkOverlap`
+| Number of characters to overlap between consecutive chunks.
+Helps preserve context across boundaries.
+| `20`
+
+| `delimiters`
+| Ordered list of **regex strings** used for splitting.
+The chunker tries them in sequence; if none match, it falls back to the last (`""` = character-level).
+| `["\n\n", "\n", " ", ""]`
+
+| `keepDelimiter`
+| Whether to keep delimiters in chunks:
+- `NONE`: remove
+- `START`: keep at start
+- `END`: keep at end
+| `START`
+
+| `trimWhitespace`
+| Whether to trim leading/trailing whitespace in each chunk.
+| `true`
+|===
+
+=== Default Separators
 
 The default separator hierarchy is:
 

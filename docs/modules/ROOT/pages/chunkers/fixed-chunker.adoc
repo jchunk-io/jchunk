@@ -5,6 +5,22 @@
 
 The Fixed Character Chunker is a basic text processing technique where text is divided into fixed-size chunks of characters. While simple, it serves as an excellent starting point to understand text splitting fundamentals.
 
+== Installation
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.jchunk</groupId>
+    <artifactId>jchunk-fixed</artifactId>
+    <version>${jchunk.version}</version>
+</dependency>
+----
+
+[source,groovy]
+----
+implementation group: 'io.jchunk', name: 'jchunk-fixed', version: "${JCHUNK_VERSION}"
+----
+
 == Configuration
 
 [source,java]
@@ -23,6 +39,39 @@ Config config = Config.builder()
 
 FixedChunker chunker = new FixedChunker(config);
 ----
+
+=== Configuration Options
+
+[cols="1,2,3", options="header"]
+|===
+| Option | Description | Default
+
+| `chunkSize`
+| Maximum number of characters per chunk.
+Defines the "target size" of each piece. If a single segment is longer than this, it may exceed the limit.
+| `1000`
+
+| `chunkOverlap`
+| Number of characters to overlap between consecutive chunks.
+Useful for preserving context across chunk boundaries.
+| `100`
+
+| `delimiter`
+| Regex string used to split text before forming chunks.
+Common values: `" "` for spaces, `"\\n"` for newlines, `""` for character-level.
+| `" "` (space)
+
+| `trimWhitespace`
+| Whether to trim leading/trailing whitespace from each chunk.
+| `true`
+
+| `keepDelimiter`
+| Controls how delimiters are kept in chunks:
+- `NONE`: remove
+- `START`: keep at start
+- `END`: keep at end
+| `NONE`
+|===
 
 == Examples
 

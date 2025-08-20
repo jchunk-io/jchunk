@@ -3,9 +3,9 @@ package io.jchunk.recursive;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.jchunk.commons.Delimiter;
 import java.util.List;
 import java.util.stream.Stream;
-import jchunk.chunker.Delimiter;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ class ConfigTest {
         assertThat(config.getTrimWhiteSpace()).isFalse();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("provideInvalidConfiguration")
     void test_invalid_config(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)

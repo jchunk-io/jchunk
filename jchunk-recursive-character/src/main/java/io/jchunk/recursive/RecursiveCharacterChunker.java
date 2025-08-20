@@ -1,5 +1,6 @@
 package io.jchunk.recursive;
 
+import io.jchunk.commons.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
 import java.util.*;
@@ -7,11 +8,51 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import jchunk.chunker.Delimiter;
 
 /**
- * {@link RecursiveCharacterChunker} is a class that implements the {@link IChunker} interface and
- * splits a text into chunks recursively with the given separators.
+ * Recursive, delimiter-aware chunker.
+ *
+ * <p>Implements {@link IChunker} to split text into {@link Chunk} objects using a hierarchical set
+ * of delimiters (e.g., paragraph breaks, newlines, spaces, falling back to characters). The split
+ * proceeds recursively: if a fragment exceeds {@code chunkSize}, it is re-split using the next delimiter.
+ *
+ * <p>Features:
+ * <ul>
+ *   <li><b>Target size:</b> each chunk aims to be ≤ {@code chunkSize}.</li>
+ *   <li><b>Overlap:</b> adjacent chunks keep {@code chunkOverlap} characters of overlap.</li>
+ *   <li><b>Delimiters:</b> evaluated in the order provided by {@link Config#getDelimiters()}.
+ *       An empty delimiter means character-level splitting.</li>
+ *   <li><b>Delimiter retention:</b> controlled by {@link Config#getKeepDelimiter()}
+ *       (START, END, or NONE).</li>
+ *   <li><b>Whitespace handling:</b> leading/trailing whitespace trimming via
+ *       {@link Config#getTrimWhiteSpace()}.</li>
+ * </ul>
+ *
+ * <p>Contract:
+ * <ul>
+ *   <li>Non-empty input yields a non-empty list of chunks.</li>
+ *   <li>The chunker <i>tries</i> to respect {@code chunkSize}; if it cannot (e.g., no suitable
+ *       delimiter), a larger chunk may be produced and a warning is logged.</li>
+ *   <li>Chunk indices are assigned monotonically during a single {@link #split(String)} call.</li>
+ * </ul>
+ *
+ * <p>Example:
+ * <pre>{@code
+ * Config cfg = Config.builder()
+ *     .chunkSize(200)
+ *     .chunkOverlap(40)
+ *     .delimiters(List.of("\n\n", "\n", " ", "")) // paragraph → line → word → char
+ *     .keepDelimiter(Delimiter.END)
+ *     .trimWhitespace(true)
+ *     .build();
+ *
+ * IChunker chunker = new RecursiveCharacterChunker(cfg);
+ * List<Chunk> chunks = chunker.split(text);
+ * }</pre>
+ *
+ * @see Config
+ * @see Delimiter
+ * @see IChunker
  *
  * @author Pablo Sanchidrian Herrera
  */
@@ -32,18 +73,25 @@ public class RecursiveCharacterChunker implements IChunker {
         this.config = config;
     }
 
+    /**
+     * Splits the provided content according to the configured delimiters and size/overlap policy.
+     *
+     * @param content input text to split
+     * @return ordered list of {@link Chunk}
+     */
     @Override
     public List<Chunk> split(String content) {
         return splitContent(content, config.getDelimiters(), new AtomicInteger(0));
     }
 
     /**
-     * Splits the content into chunks.
+     * Recursively splits {@code content} using the remaining {@code delimiters}.
+     * The {@code index} is incremented as chunks are produced.
      *
-     * @param content the content to split
-     * @param delimiters the list of delimiters to split the content
-     * @param index the index of the chunk
-     * @return the list of chunks {@link Chunk}
+     * @param content     the text to split
+     * @param delimiters  remaining delimiters (will be consumed as recursion proceeds)
+     * @param index       running chunk index (shared across recursion)
+     * @return list of generated chunks
      */
     @SuppressWarnings("java:S3776")
     private List<Chunk> splitContent(String content, List<String> delimiters, AtomicInteger index) {
@@ -87,11 +135,13 @@ public class RecursiveCharacterChunker implements IChunker {
     }
 
     /**
-     * Get the best matching delimiter from right to left in the delimiter list from the given config
+     * Returns the first delimiter (in order) that matches {@code content}.
+     * Removes the chosen delimiter from {@code delimiters}. If the empty delimiter is encountered,
+     * clears the list to force character-level splitting.
      *
-     * @param content the content to split
-     * @param delimiters the list of delimiters to check
-     * @return the best matching delimiter and modifies the reference value of the given list
+     * @param content       the text being analyzed
+     * @param delimiters    candidate delimiters (modified in place)
+     * @return the best matching delimiter, or {@code ""} if none
      */
     private String getBestMatchingDelimiter(String content, List<String> delimiters) {
         for (Iterator<String> iterator = delimiters.iterator(); iterator.hasNext(); ) {
@@ -112,11 +162,12 @@ public class RecursiveCharacterChunker implements IChunker {
     }
 
     /**
-     * Splits the content into sentences using the delimiter.
+     * Splits {@code content} by {@code delimiter}, applying the configured delimiter-retention policy
+     * ({@link Delimiter#START}, {@link Delimiter#END}, or {@link Delimiter#NONE}).
      *
-     * @param content the content to split
-     * @param delimiter the delimiter to split the content.
-     * @return a list of split sentences
+     * @param content   the text to split
+     * @param delimiter the delimiter regex for content splitting
+     * @return split fragments
      */
     private List<String> splitWithDelimiter(String content, String delimiter) {
         if (delimiter.isEmpty()) {
@@ -174,10 +225,13 @@ public class RecursiveCharacterChunker implements IChunker {
     }
 
     /**
-     * Merges the sentences into chunks.
+     * Merges fragments into size-bounded chunks while maintaining the configured overlap.
+     * Emits a warning if a produced chunk exceeds {@code chunkSize}.
      *
-     * @param sentences the sentences to merge
-     * @return list of chunks
+     * @param sentences   candidate fragments to merge
+     * @param delimiter   glue used when joining fragments
+     * @param index       running chunk index
+     * @return generated chunks (ordered)
      */
     private List<Chunk> mergeSentences(List<String> sentences, String delimiter, AtomicInteger index) {
 
@@ -216,10 +270,10 @@ public class RecursiveCharacterChunker implements IChunker {
     /**
      * Adds the chunk to the list of chunks.
      *
-     * @param chunks the list of chunks
-     * @param currentChunk the current chunk
-     * @param delimiter the delimiter
-     * @param index the index of the chunk
+     * @param chunks        the list of chunks
+     * @param currentChunk  the current chunk
+     * @param delimiter     the delimiter
+     * @param index         the index of the chunk
      */
     private void addChunk(List<Chunk> chunks, Deque<String> currentChunk, String delimiter, AtomicInteger index) {
         var generatedSentence = joinSentences(new ArrayList<>(currentChunk), delimiter);
@@ -230,9 +284,9 @@ public class RecursiveCharacterChunker implements IChunker {
     /**
      * Adjusts the current chunk for overlap.
      *
-     * @param currentChunk the current chunk
-     * @param currentLen the current length of the chunk
-     * @param delimiterLen the length of the delimiter
+     * @param currentChunk  the current chunk
+     * @param currentLen    the current length of the chunk
+     * @param delimiterLen  the length of the delimiter
      * @return the adjusted length of the chunk
      */
     private int adjustCurrentChunkForOverlap(Deque<String> currentChunk, int currentLen, int delimiterLen) {

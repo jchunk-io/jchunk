@@ -3,8 +3,8 @@ package io.jchunk.fixed;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.jchunk.commons.Delimiter;
 import java.util.stream.Stream;
-import jchunk.chunker.Delimiter;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class ConfigTest {
         assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.START);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("provideInvalidConfig")
     void test_invalid_config(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)
