@@ -15,12 +15,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Embeds input text into dense vectors using a HuggingFace tokenizer and an ONNX model.
+ * Default {@link Embedder} implementation backed by a HuggingFace tokenizer
+ * and an ONNX model for generating vector embeddings.
  *
- * <p>Loads its tokenizer and model from the classpath and applies mean pooling on the last hidden
- * states.
+ * <p>This embedder:
+ * <ul>
+ *   <li>Loads its tokenizer ({@code tokenizer.json}) and model ({@code model.onnx})
+ *       from the application classpath.</li>
+ *   <li>Uses DJL's {@link HuggingFaceTokenizer} for tokenization.</li>
+ *   <li>Runs inference with the ONNX Runtime via {@link OrtSession}.</li>
+ *   <li>Applies mean pooling over the last hidden states to produce a fixed-size embedding
+ *       for each input string.</li>
+ * </ul>
  *
- * <p><i>Inspired by <a href="https://spring.io/projects/spring-ai">Spring AI</a> default Embedding Model impl</i>
+ * <p>By default, the following resources are expected in the classpath:
+ * <ul>
+ *   <li>{@code onnx/tokenizer.json} – HuggingFace tokenizer definition.</li>
+ *   <li>{@code onnx/model.onnx} – ONNX model file.</li>
+ * </ul>
+ *
+ * <h5>Lifecycle</h5>
+ * <p>This class implements {@link AutoCloseable} and should be closed after use
+ * to release native resources associated with the ONNX runtime and tokenizer.</p>
+ *
+ * <h5>Example</h5>
+ * <pre>{@code
+ * try (JChunkEmbedder embedder = new JChunkEmbedder()) {
+ *     float[] vector = embedder.embed("Hello world");
+ *     System.out.println("Vector dimension: " + embedder.getDimension());
+ * }
+ * }</pre>
+ *
+ * <h5>Error handling</h5>
+ * <ul>
+ *   <li>Throws {@link IOException} if tokenizer or model resources cannot be found.</li>
+ *   <li>Throws {@link RuntimeException} if ONNX inference fails at runtime.</li>
+ *   <li>Throws {@link IllegalArgumentException} if input text is {@code null} or empty.</li>
+ * </ul>
+ *
+ * <p><i>Inspired by
+ * <a href="https://spring.io/projects/spring-ai">Spring AI</a>'s default embedding model implementation.</i></p>
  *
  * @author Pablo Sanchidrian Herrera
  */
