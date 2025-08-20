@@ -43,7 +43,7 @@ class ConfigTest {
         assertThat(config.getKeepDelimiter()).isEqualTo(Delimiter.START);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("provideInvalidConfig")
     void test_invalid_config(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)

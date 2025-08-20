@@ -44,7 +44,7 @@ class ConfigTest {
         assertThat(config.getTrimWhiteSpace()).isFalse();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("provideInvalidConfiguration")
     void test_invalid_config(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)
