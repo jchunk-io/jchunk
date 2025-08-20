@@ -5,15 +5,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.stream.Stream;
 import jchunk.chunker.Delimiter;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ConfigTest {
 
     @Test
-    void testDefaultConfig() {
+    void test_default_builder_config() {
         Config config = Config.builder().build();
 
         assertThat(config.getChunkSize()).isEqualTo(1000);
@@ -24,7 +27,7 @@ class ConfigTest {
     }
 
     @Test
-    void testConfigBuilder() {
+    void test_config_builder() {
         Config config = Config.builder()
                 .chunkSize(35)
                 .chunkOverlap(4)
@@ -42,7 +45,7 @@ class ConfigTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidConfig")
-    void testInvalidConfig(Config.Builder invalidConfigToBuild, String expectedMessage) {
+    void test_invalid_config(Config.Builder invalidConfigToBuild, String expectedMessage) {
         assertThatThrownBy(invalidConfigToBuild::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);

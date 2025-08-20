@@ -4,8 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.jchunk.core.chunk.Chunk;
 import java.util.List;
+import java.util.stream.Stream;
+import jchunk.chunker.Delimiter;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class RecursiveCharacterChunkerTest {
 
     static String content =
@@ -18,7 +26,7 @@ class RecursiveCharacterChunkerTest {
 			""";
 
     @Test
-    void testSplit() {
+    void test_content_split() {
         Config config = Config.builder().chunkSize(65).chunkOverlap(0).build();
         RecursiveCharacterChunker chunker = new RecursiveCharacterChunker(config);
 
@@ -51,7 +59,7 @@ class RecursiveCharacterChunkerTest {
     }
 
     @Test
-    void testSplitWithBigChunkSize() {
+    void test_split_with_big_chunk_size() {
         Config config = Config.builder().chunkSize(450).chunkOverlap(0).build();
         RecursiveCharacterChunker chunker = new RecursiveCharacterChunker(config);
 
@@ -74,5 +82,52 @@ class RecursiveCharacterChunkerTest {
             assertThat(chunks.get(i).id()).isEqualTo(expectedChunks.get(i).id());
             assertThat(chunks.get(i).content()).isEqualTo(expectedChunks.get(i).content());
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSplitWithOverlapScenarios")
+    void test_split_with_overlap(Delimiter keepDelimiter, List<String> expectedContent) {
+        // given
+        var testText = "no! this is. A split";
+        var config = Config.builder()
+                .chunkSize(10)
+                .chunkOverlap(2)
+                .delimiters(List.of("!", "\\."))
+                .keepDelimiter(keepDelimiter)
+                .build();
+
+        var chunker = new RecursiveCharacterChunker(config);
+
+        // when
+        List<Chunk> chunks = chunker.split(testText);
+
+        // then
+        assertThat(chunks).isNotNull().extracting(Chunk::content).containsExactlyElementsOf(expectedContent);
+    }
+
+    private static Stream<Arguments> provideSplitWithOverlapScenarios() {
+        return Stream.of(
+                Arguments.of(Delimiter.NONE, List.of("no", "this is", "A split")),
+                Arguments.of(Delimiter.START, List.of("no", "! this is", ". A split")),
+                Arguments.of(Delimiter.END, List.of("no!", "this is.", "A split")));
+    }
+
+    @Test
+    void test_split_with_non_splittable_config_and_content() {
+        // given
+        var testText = "no split";
+        var config = Config.builder()
+                .chunkSize(10)
+                .chunkOverlap(0)
+                .delimiters(List.of("!"))
+                .keepDelimiter(Delimiter.NONE)
+                .build();
+        var chunker = new RecursiveCharacterChunker(config);
+
+        // when
+        List<Chunk> chunks = chunker.split(testText);
+
+        // then
+        assertThat(chunks).isNotNull().hasSize(1).extracting(Chunk::content).containsExactly(testText);
     }
 }

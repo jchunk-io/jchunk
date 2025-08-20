@@ -8,12 +8,15 @@ import io.jchunk.core.chunk.Chunk;
 import io.jchunk.semantic.embedder.Embedder;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class SemanticChunkerTest {
 
     private static final double MARGIN = 0.0001d;
@@ -30,7 +33,7 @@ class SemanticChunkerTest {
     // @formatter:off
 
     @Test
-    void splitSentenceDefaultStrategyTest() {
+    void split_sentences_with_default_strategy() {
         // given
         var expectedResult = List.of(
                 Sentence.of(0, "This is a test sentence."),
@@ -53,7 +56,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void splitSentenceStrategyTest() {
+    void split_sentences_with_line_break_strategy() {
         // given
         var expectedResult = List.of(
                 Sentence.of(0, "This is a test sentence. How are u? I am fine thanks"),
@@ -72,7 +75,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void splitSentenceParagraphStrategyTest() {
+    void split_sentences_with_paragraph_strategy() {
         // given
         var expectedResult = List.of(
                 Sentence.of(0, "This is a test sentence."),
@@ -93,7 +96,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void combineSentencesSuccessTest() {
+    void combine_sentences_test() {
         // given
         var bufferSize = 2;
         var input = List.of(
@@ -133,14 +136,14 @@ class SemanticChunkerTest {
 
     @ParameterizedTest
     @MethodSource("provideCombineSentencesFailureScenarios")
-    void combineSentencesFailureScenariosTest(List<Sentence> sentences, Integer bufferSize, String expectedMsg) {
+    void combine_sentences_fail(List<Sentence> sentences, Integer bufferSize, String expectedMsg) {
         assertThatThrownBy(() -> semanticChunker.combineSentences(sentences, bufferSize))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMsg);
     }
 
     @Test
-    void embedSentencesTest() {
+    void embed_sentences() {
         // given
         Mockito.when(embeddingModel.embed(Mockito.anyList()))
                 .thenReturn(List.of(new float[] {1.0f, 2.0f, 3.0f}, new float[] {4.0f, 5.0f, 6.0f}));
@@ -175,7 +178,7 @@ class SemanticChunkerTest {
 
     @ParameterizedTest
     @MethodSource("provideVectorScenarios")
-    void testVectorScenarios(float[] embedding1, float[] embedding2, double expectedResult, boolean isExact) {
+    void cosine_similarity_test(float[] embedding1, float[] embedding2, double expectedResult, boolean isExact) {
         // when
         double result = semanticChunker.cosineSimilarity(embedding1, embedding2);
 
@@ -185,7 +188,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void testZeroVectors() {
+    void cosine_similarity_zero_vectors() {
         // given
         var embedding1 = new float[] {0.0f, 0.0f, 0.0f};
         var embedding2 = new float[] {0.0f, 0.0f, 0.0f};
@@ -198,7 +201,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void testGetIndicesAboveThreshold() {
+    void get_indices_above_threshold() {
         // given
         var percentile = 95;
         var distances = List.of(10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0);
@@ -212,7 +215,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void testGenerateChunks() {
+    void generate_chunk_from_break_points() {
         // given
         var sentences = List.of(
                 Sentence.of(0, "This"),
@@ -247,7 +250,7 @@ class SemanticChunkerTest {
     }
 
     @Test
-    void testGenerateChunksWithNoBreakPoints() {
+    void generate_chunks_with_no_break_points() {
         // given
         var sentences = List.of(Sentence.of(0, "this is"), Sentence.of(1, "a test"));
 

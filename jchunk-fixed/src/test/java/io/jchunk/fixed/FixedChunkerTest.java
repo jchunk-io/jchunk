@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.jchunk.core.chunk.Chunk;
 import java.util.List;
 import jchunk.chunker.Delimiter;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class FixedChunkerTest {
 
     private FixedChunker chunker;
@@ -17,7 +20,7 @@ class FixedChunkerTest {
     // @formatter:off
 
     @Test
-    void testSplitWithDefaultConfig() {
+    void test_split_with_default_config() {
         // given
         chunker = new FixedChunker();
         List<Chunk> expectedChunks = List.of(
@@ -31,10 +34,10 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitWithCustomDelimiter() {
+    void test_split_with_custom_delimiter() {
         // given
         Config config =
-                Config.builder().chunkSize(20).chunkOverlap(0).delimiter(".").build();
+                Config.builder().chunkSize(20).chunkOverlap(0).delimiter("\\.").build();
         chunker = new FixedChunker(config);
 
         List<Chunk> expectedChunks =
@@ -48,7 +51,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitWithCustomConfig() {
+    void test_split_with_custom_config() {
         // given
         Config config =
                 Config.builder().chunkSize(35).chunkOverlap(4).delimiter("").build();
@@ -67,7 +70,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitWithCustomConfigNoWhiteSpace() {
+    void test_split_with_custom_config_no_white_space() {
         // given
         Config config = Config.builder()
                 .chunkSize(35)
@@ -90,7 +93,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitWithCustomConfigWithKeepDelimiterSetToNone() {
+    void test_split_with_custom_config_with_keep_delimiter_none() {
         // given
         Config config = Config.builder()
                 .chunkSize(35)
@@ -113,7 +116,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitIntoSentencesWithBlankSeparator() {
+    void test_split_into_sentences_with_blank_separator() {
         // given
         chunker = new FixedChunker();
         Config config = Config.builder().delimiter("").build();
@@ -130,7 +133,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitIntoSentencesWithNoDelimiter() {
+    void test_split_into_sentences_with_no_delimiter() {
         // given
         chunker = new FixedChunker();
         Config config = Config.builder().delimiter("ch").build();
@@ -145,7 +148,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitIntoSentencesWithDelimiterStart() {
+    void test_split_into_sentences_with_delimiter_start() {
         // given
         chunker = new FixedChunker();
         Config config =
@@ -161,7 +164,7 @@ class FixedChunkerTest {
     }
 
     @Test
-    void testSplitIntoSentencesWithDelimiterEnd() {
+    void test_split_into_sentences_with_delimiter_end() {
         // given
         chunker = new FixedChunker();
         Config config =
