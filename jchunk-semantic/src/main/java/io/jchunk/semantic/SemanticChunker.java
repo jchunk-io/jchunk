@@ -12,7 +12,21 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A semantic chunker that chunks the content based on the semantic meaning
+ * A semantic chunker that splits input text into a list of {@link Chunk}
+ * based on semantic coherence rather than fixed length or naive delimiters.
+ *
+ * <p>The algorithm works in several stages:
+ * <ol>
+ *   <li>Split the input text into sentences using a configurable regex strategy.</li>
+ *   <li>Combine sentences into overlapping windows (buffers) to preserve context.</li>
+ *   <li>Generate embeddings for each combined sentence using the configured {@link Embedder}.</li>
+ *   <li>Compute cosine similarity between consecutive sentence embeddings.</li>
+ *   <li>Determine break points by applying a percentile threshold to the similarity scores.</li>
+ *   <li>Assemble the final chunks by grouping sentences between break points.</li>
+ * </ol>
+ *
+ * <p>Configuration such as splitting strategy, buffer size, and similarity threshold
+ * is provided via {@link Config}.
  *
  * @author Pablo Sanchidrian Herrera
  */
@@ -31,9 +45,15 @@ public class SemanticChunker implements IChunker {
         this.config = config;
     }
 
+    /**
+     * Splits the given text into semantic chunks.
+     *
+     * @param content the raw text to split
+     * @return a list of semantic chunks
+     */
     @Override
     public List<Chunk> split(String content) {
-        var sentences = splitSentences(content, config.sentenceSplittingStrategy());
+        var sentences = splitSentences(content, config.getSentenceSplittingRegex());
 
         if (sentences.size() == 1) {
             var sentence = sentences.getFirst();
@@ -41,36 +61,40 @@ public class SemanticChunker implements IChunker {
             return List.of(chunk);
         }
 
-        sentences = combineSentences(sentences, config.bufferSize());
+        sentences = combineSentences(sentences, config.getBufferSize());
         sentences = embedSentences(embedder, sentences);
         var similarities = calculateSimilarities(sentences);
-        var breakPoints = calculateBreakPoints(similarities, config.percentile());
+        var breakPoints = calculateBreakPoints(similarities, config.getPercentile());
         return generateChunks(sentences, breakPoints);
     }
 
     /**
-     * Split the content into sentences
+     * Splits the content into raw sentences using the given regex.
      *
-     * @param content the content to split
-     * @return the list of sentences
+     * @param content the text to split
+     * @param regex the regex used for splitting
+     * @return a list of {@link Sentence} objects
+     *
+     * @implNote The regex is passed explicitly (instead of reading from {@link Config})
+     *           to simplify testing with different splitting strategies.
      */
     @VisibleForTesting
-    List<Sentence> splitSentences(String content, SentenceSplittingStrategy splittingStrategy) {
+    List<Sentence> splitSentences(final String content, final String regex) {
         var index = new AtomicInteger(0);
-        return Arrays.stream(content.split(splittingStrategy.getStrategy()))
+        return Arrays.stream(content.split(regex))
                 .map(sentence -> Sentence.of(index.getAndIncrement(), sentence))
                 .toList();
     }
 
     /**
-     * Combine the sentences based on the buffer size (append the buffer size of sentences behind and
-     * over the current sentence)
-     *
-     * <p>Use the sliding window technique to reduce the time complexity
+     * Combines sentences into overlapping windows according to the given buffer size.
+     * Each combined sentence includes the current sentence and its surrounding context.
      *
      * @param sentences the list of sentences
-     * @param bufferSize the buffer size to use
-     * @return the list of combined sentences
+     * @param bufferSize the number of sentences before and after to include
+     * @return the list of sentences with combined context
+     *
+     * @implNote this method is implemented using the sliding window technique to reduce the time complexity
      */
     @VisibleForTesting
     List<Sentence> combineSentences(List<Sentence> sentences, Integer bufferSize) {
@@ -118,10 +142,11 @@ public class SemanticChunker implements IChunker {
     }
 
     /**
-     * Embed the sentences using the embedding model
+     * Generates embeddings for the given sentences using the configured {@link Embedder}.
      *
+     * @param embedder the embedding provider
      * @param sentences the list of sentences
-     * @return the list of sentences with the embeddings
+     * @return the sentences enriched with embeddings
      */
     @VisibleForTesting
     List<Sentence> embedSentences(final Embedder embedder, final List<Sentence> sentences) {
@@ -133,6 +158,24 @@ public class SemanticChunker implements IChunker {
                     var sentence = sentences.get(i);
                     sentence.setEmbedding(embeddings.get(i));
                     return sentence;
+                })
+                .toList();
+    }
+
+    /**
+     * Computes pairwise similarities between consecutive sentences.
+     *
+     * @param sentences the list of sentences with embeddings
+     * @return a list of similarity scores
+     */
+    @VisibleForTesting
+    List<Double> calculateSimilarities(final List<Sentence> sentences) {
+        return IntStream.range(0, sentences.size() - 1)
+                .parallel()
+                .mapToObj(i -> {
+                    Sentence sentence1 = sentences.get(i);
+                    Sentence sentence2 = sentences.get(i + 1);
+                    return cosineSimilarity(sentence1.getEmbedding(), sentence2.getEmbedding());
                 })
                 .toList();
     }
@@ -163,28 +206,12 @@ public class SemanticChunker implements IChunker {
     }
 
     /**
-     * Calculate the similarity between the sentences embeddings
+     * Determines break points where new chunks should begin, based on the given percentile
+     * threshold applied to similarity scores.
      *
-     * @param sentences the list of sentences
-     * @return the list of similarities (List of double)
-     */
-    @VisibleForTesting
-    List<Double> calculateSimilarities(final List<Sentence> sentences) {
-        return IntStream.range(0, sentences.size() - 1)
-                .parallel()
-                .mapToObj(i -> {
-                    Sentence sentence1 = sentences.get(i);
-                    Sentence sentence2 = sentences.get(i + 1);
-                    return cosineSimilarity(sentence1.getEmbedding(), sentence2.getEmbedding());
-                })
-                .toList();
-    }
-
-    /**
-     * Calculate the break points indices based on the similarities and the threshold
-     *
-     * @param distances the list of cosine similarities between the sentences
-     * @return the list of break points indices
+     * @param distances list of cosine similarities between consecutive sentences
+     * @param percentile the percentile threshold (e.g. 95)
+     * @return the list of indices representing break points
      */
     @VisibleForTesting
     List<Integer> calculateBreakPoints(final List<Double> distances, final int percentile) {
@@ -199,23 +226,12 @@ public class SemanticChunker implements IChunker {
                 .toList();
     }
 
-    private double calculatePercentile(final List<Double> distances, final int percentile) {
-        Assertions.notNull(distances, "The list of distances cannot be null");
-        Assertions.isTrue(
-                percentile > 0 && percentile < 100, "The percentile must be greater than 0 and less than 100");
-
-        var sortedDistances = distances.stream().sorted().toList();
-
-        var rank = (int) Math.ceil(percentile / 100.0 * distances.size());
-        return sortedDistances.get(rank - 1);
-    }
-
     /**
-     * Generate chunks combining the sentences based on the break points
+     * Generates the final chunks by grouping sentences according to the break points.
      *
      * @param sentences the list of sentences
-     * @param breakPoints the list of break points indices
-     * @return the list of chunks
+     * @param breakPoints the indices where splits should occur
+     * @return the final list of semantic chunks
      */
     @VisibleForTesting
     List<Chunk> generateChunks(final List<Sentence> sentences, final List<Integer> breakPoints) {
@@ -235,5 +251,14 @@ public class SemanticChunker implements IChunker {
                     return new Chunk(index.getAndIncrement(), content);
                 })
                 .toList();
+    }
+
+    private double calculatePercentile(final List<Double> distances, final int percentile) {
+        Assertions.notNull(distances, "The list of distances cannot be null");
+
+        var sortedDistances = distances.stream().sorted().toList();
+
+        var rank = (int) Math.ceil(percentile / 100.0 * distances.size());
+        return sortedDistances.get(rank - 1);
     }
 }
