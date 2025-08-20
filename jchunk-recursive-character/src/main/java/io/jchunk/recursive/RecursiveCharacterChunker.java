@@ -16,7 +16,7 @@ import jchunk.chunker.Delimiter;
  * of delimiters (e.g., paragraph breaks, newlines, spaces, falling back to characters). The split
  * proceeds recursively: if a fragment exceeds {@code chunkSize}, it is re-split using the next delimiter.
  *
- * <h5>Features</h5>
+ * <p>Features:
  * <ul>
  *   <li><b>Target size:</b> each chunk aims to be ≤ {@code chunkSize}.</li>
  *   <li><b>Overlap:</b> adjacent chunks keep {@code chunkOverlap} characters of overlap.</li>
@@ -28,7 +28,7 @@ import jchunk.chunker.Delimiter;
  *       {@link Config#getTrimWhiteSpace()}.</li>
  * </ul>
  *
- * <h5>Contract</h5>
+ * <p>Contract:
  * <ul>
  *   <li>Non-empty input yields a non-empty list of chunks.</li>
  *   <li>The chunker <i>tries</i> to respect {@code chunkSize}; if it cannot (e.g., no suitable
@@ -36,7 +36,7 @@ import jchunk.chunker.Delimiter;
  *   <li>Chunk indices are assigned monotonically during a single {@link #split(String)} call.</li>
  * </ul>
  *
- * <h5>Example</h5>
+ * <p>Example:
  * <pre>{@code
  * Config cfg = Config.builder()
  *     .chunkSize(200)

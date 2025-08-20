@@ -25,8 +25,8 @@ import jchunk.chunker.Delimiter;
  *
  * <p>If a chunk exceeds the configured maximum size because it cannot be split further,
  * a warning is logged.
- *
- * <h5>Example</h5>
+ * <p>
+ * Example:
  * <pre>{@code
  * Config cfg = Config.builder()
  *     .chunkSize(1000)

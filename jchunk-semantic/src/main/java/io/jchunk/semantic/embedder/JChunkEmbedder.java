@@ -34,11 +34,11 @@ import org.slf4j.LoggerFactory;
  *   <li>{@code onnx/model.onnx} – ONNX model file.</li>
  * </ul>
  *
- * <h5>Lifecycle</h5>
+ * <p>Lifecycle:
  * <p>This class implements {@link AutoCloseable} and should be closed after use
  * to release native resources associated with the ONNX runtime and tokenizer.</p>
  *
- * <h5>Example</h5>
+ * <p>Example:
  * <pre>{@code
  * try (JChunkEmbedder embedder = new JChunkEmbedder()) {
  *     float[] vector = embedder.embed("Hello world");
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * }
  * }</pre>
  *
- * <h5>Error handling</h5>
+ * <p>Error handling:
  * <ul>
  *   <li>Throws {@link IOException} if tokenizer or model resources cannot be found.</li>
  *   <li>Throws {@link RuntimeException} if ONNX inference fails at runtime.</li>

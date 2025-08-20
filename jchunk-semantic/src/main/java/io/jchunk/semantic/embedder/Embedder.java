@@ -11,7 +11,7 @@ import java.util.List;
  * <p>Implementations are responsible for providing consistent vector dimensions
  * and reproducible results for the same input.</p>
  *
- * <h5>Usage</h2>
+ * <p>Usage:
  * <pre>{@code
  * Embedder embedder = ...; // your implementation
  * float[] vector = embedder.embed("Hello world");
