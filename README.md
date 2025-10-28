@@ -55,6 +55,23 @@ To check javadocs using the javadoc:javadoc
 ./mvnw javadoc:javadoc -Pjavadoc
 ```
 
+## Building the docs locally
+
+You can build and preview the Antora documentation locally without installing anything globally.
+
+Prerequisites:
+- Node.js 18+ (20 recommended). 
+  - Download from https://nodejs.org/
+
+Build the site:
+
+```sh
+npx -y -p @antora/cli@3.1 -p @antora/site-generator@3.1 antora -r @antora/site-generator antora-playbook.yml
+```
+
+Open the generated site:
+- `build/site/index.html`
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

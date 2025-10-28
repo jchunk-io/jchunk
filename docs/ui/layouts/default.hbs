@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{> head}}
+</head>
+<body>
+  <header class="navbar" role="banner">
+    <div class="container">
+      {{> header-content}}
+    </div>
+  </header>
+
+  <main id="content" class="container" role="main">
+    {{#if page.title}}
+      <h1 class="page-title">{{page.title}}</h1>
+    {{/if}}
+    <article class="doc">
+      {{{page.contents}}}
+    </article>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      {{> footer-content}}
+    </div>
+  </footer>
+</body>
+</html>

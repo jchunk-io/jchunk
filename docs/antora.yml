@@ -1,4 +1,4 @@
-name: Jchunk
+name: jchunk
 version:
   v(?<version>+({0..9}).+({0..9}).+({0..9})): $<version>
   early-access: snapshot
