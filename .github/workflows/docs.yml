@@ -37,6 +37,10 @@ jobs:
         run: |
           npx -y -p @antora/cli@3.1 -p @antora/site-generator@3.1 antora -r @antora/site-generator antora-playbook.yml
 
+      - name: Disable Jekyll on Pages
+        run: |
+          echo > build/site/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
