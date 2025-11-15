@@ -1,7 +1,7 @@
 # JChunk
 
 [![GitHub Actions Status](https://img.shields.io/github/actions/workflow/status/jchunk-io/jchunk/build.yml?branch=main&logo=GitHub&style=for-the-badge)](.)
-[![Apache 2.0 License](https://img.shields.io/github/license/arconia-io/arconia?style=for-the-badge&logo=apache&color=brightgreen)](.)
+[![Apache 2.0 License](https://img.shields.io/github/license/jchunk-io/jchunk?style=for-the-badge&logo=apache&color=brightgreen)](.)
 
 ## A Java Library for Text Chunking
 

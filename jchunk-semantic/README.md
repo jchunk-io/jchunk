@@ -1,7 +1,7 @@
 # SemanticChunker
 
 Splits text into chunks based on **semantic similarity** using embeddings.  
-Instead of relying only on character counts or delimiters, it groups sentences into coherent chunks that better preserve meaning — useful for **RAG pipelines**, **semantic search**, and **embedding-based retrieval**.
+Instead of relying only on character counts or delimiters, it groups sentences into coherent chunks that better preserve meaning, useful for **RAG pipelines**, **semantic search**, and **embedding-based retrieval**.
 
 ## Installing
 
