@@ -1,7 +1,7 @@
 # JChunk
 
 [![GitHub Actions Status](https://img.shields.io/github/actions/workflow/status/jchunk-io/jchunk/build.yml?branch=main&logo=GitHub&style=for-the-badge)](.)
-[![Apache 2.0 License](https://img.shields.io/github/license/arconia-io/arconia?style=for-the-badge&logo=apache&color=brightgreen)](.)
+[![Apache 2.0 License](https://img.shields.io/github/license/jchunk-io/jchunk?style=for-the-badge&logo=apache&color=brightgreen)](.)
 
 ## A Java Library for Text Chunking
 
@@ -54,23 +54,6 @@ To check javadocs using the javadoc:javadoc
 ```sh
 ./mvnw javadoc:javadoc -Pjavadoc
 ```
-
-## Building the docs locally
-
-You can build and preview the Antora documentation locally without installing anything globally.
-
-Prerequisites:
-- Node.js 18+ (20 recommended). 
-  - Download from https://nodejs.org/
-
-Build the site:
-
-```sh
-npx -y -p @antora/cli@3.1 -p @antora/site-generator@3.1 antora -r @antora/site-generator antora-playbook.yml
-```
-
-Open the generated site:
-- `build/site/index.html`
 
 ## Contributing
 
