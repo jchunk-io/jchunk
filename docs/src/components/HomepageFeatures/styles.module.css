@@ -1,0 +1,15 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featuresRow {
+  justify-content: center;
+  gap: 2rem;
+}
+
+.card {
+  height: 100%;
+}
