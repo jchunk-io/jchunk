@@ -11,8 +11,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://jchunk-io.github.io',
-  baseUrl: '/jchunk/',
+  url: 'https://docs.jchunk.io',
+  baseUrl: '/',
   organizationName: 'jchunk-io',
   projectName: 'jchunk',
   onBrokenLinks: 'throw',
