@@ -139,7 +139,7 @@ class SemanticChunkerTest {
 
     @ParameterizedTest
     @MethodSource("provideCombineSentencesFailureScenarios")
-    void combine_sentences_fail(List<Sentence> sentences, Integer bufferSize, String expectedMsg) {
+    void combine_sentences_fail(List<Sentence> sentences, int bufferSize, String expectedMsg) {
         assertThatThrownBy(() -> semanticChunker.combineSentences(sentences, bufferSize))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMsg);
@@ -207,14 +207,15 @@ class SemanticChunkerTest {
     void get_indices_above_threshold() {
         // given
         var percentile = 95;
-        var distances = List.of(10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0);
-        var expectedIndices = List.of(13);
+        var distances =
+                new double[] {10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0};
+        var expectedIndex = 13;
 
         // when
         var actualIndices = semanticChunker.calculateBreakPoints(distances, percentile);
 
         // then
-        assertThat(actualIndices).isEqualTo(expectedIndices);
+        assertThat(actualIndices).containsExactly(expectedIndex);
     }
 
     @Test
@@ -231,7 +232,7 @@ class SemanticChunkerTest {
                 Sentence.of(7, "unit"),
                 Sentence.of(8, "tests."));
 
-        var breakPoints = List.of(2, 4, 6);
+        var breakPoints = new int[] {2, 4, 6};
 
         var expectedChunks = List.of(
                 new Chunk(0, "This is a"),
@@ -256,8 +257,7 @@ class SemanticChunkerTest {
     void generate_chunks_with_no_break_points() {
         // given
         var sentences = List.of(Sentence.of(0, "this is"), Sentence.of(1, "a test"));
-
-        List<Integer> breakPoints = List.of();
+        var breakPoints = new int[] {};
 
         var expectedChunks = List.of(Chunk.of(0, "this is a test"));
 
@@ -272,7 +272,6 @@ class SemanticChunkerTest {
         final var nonEmptySentences = List.of(Sentence.of(0, "This"), Sentence.of(1, "is"));
         return Stream.of(
                 Arguments.of(nonEmptySentences, 0, "The buffer size must be greater than 0"),
-                Arguments.of(nonEmptySentences, null, "The buffer size cannot be null"),
                 Arguments.of(nonEmptySentences, 2, "The buffer size must be smaller than the sentences size"),
                 Arguments.of(null, 2, "The list of sentences cannot be null"),
                 Arguments.of(List.of(), 2, "The list of sentences cannot be empty"));

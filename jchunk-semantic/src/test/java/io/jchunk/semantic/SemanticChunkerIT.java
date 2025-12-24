@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Integration tests for the {@link SemanticChunker}.
@@ -69,6 +71,29 @@ class SemanticChunkerIT {
     }
 
     /**
+     * Two clear topics, pets and finance, with a high percentile we expect two chunks.
+     * Note: we use high percentile to make it deterministic
+     */
+    @Test
+    void split_deterministic_content() {
+        var content =
+                """
+                Cats are friendly animals.
+                Many people love their dogs.
+                Pets bring joy to families.
+                The stock market fell sharply today.
+                Investors are concerned about inflation and interest rates.
+                Bank earnings impacted overall sentiment.
+                """;
+
+        // when
+        var chunks = semanticChunker.split(content);
+
+        // then
+        assertThat(chunks).isNotNull().hasSize(2);
+    }
+
+    /**
      * Verifies that if the input consists of a single sentence,
      * the chunker produces exactly one chunk with the original content.
      */
@@ -82,6 +107,16 @@ class SemanticChunkerIT {
 
         // then
         assertThat(chunks).hasSize(1).extracting(Chunk::content).containsExactly(text);
+    }
+
+    @ParameterizedTest(name = "blank input use case {index}")
+    @ValueSource(strings = {"", " ", "\n", "\n\n"})
+    void should_return_empty_list_when_input_is_blank(String input) {
+        // when
+        var chunks = semanticChunker.split(input);
+
+        // then
+        assertThat(chunks).isEmpty();
     }
 
     // HELPERS
