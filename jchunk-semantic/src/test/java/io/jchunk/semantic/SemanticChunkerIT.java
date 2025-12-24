@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Integration tests for the {@link SemanticChunker}.
@@ -105,6 +107,16 @@ class SemanticChunkerIT {
 
         // then
         assertThat(chunks).hasSize(1).extracting(Chunk::content).containsExactly(text);
+    }
+
+    @ParameterizedTest(name = "blank input use case {index}")
+    @ValueSource(strings = {"", " ", "\n", "\n\n"})
+    void should_return_empty_list_when_input_is_blank(String input) {
+        // when
+        var chunks = semanticChunker.split(input);
+
+        // then
+        assertThat(chunks).isEmpty();
     }
 
     // HELPERS
