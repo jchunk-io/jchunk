@@ -69,6 +69,29 @@ class SemanticChunkerIT {
     }
 
     /**
+     * Two clear topics, pets and finance, with a high percentile we expect two chunks.
+     * Note: we use high percentile to make it deterministic
+     */
+    @Test
+    void split_deterministic_content() {
+        var content =
+                """
+                Cats are friendly animals.
+                Many people love their dogs.
+                Pets bring joy to families.
+                The stock market fell sharply today.
+                Investors are concerned about inflation and interest rates.
+                Bank earnings impacted overall sentiment.
+                """;
+
+        // when
+        var chunks = semanticChunker.split(content);
+
+        // then
+        assertThat(chunks).isNotNull().hasSize(2);
+    }
+
+    /**
      * Verifies that if the input consists of a single sentence,
      * the chunker produces exactly one chunk with the original content.
      */

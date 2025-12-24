@@ -5,6 +5,7 @@ import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
 import io.jchunk.core.decorators.VisibleForTesting;
 import io.jchunk.semantic.embedder.Embedder;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,17 +49,24 @@ public class SemanticChunker implements IChunker {
     /**
      * Splits the given text into semantic chunks.
      *
-     * @param content the raw text to split
+     * @param content   the raw text to split
      * @return a list of semantic chunks
      */
     @Override
     public List<Chunk> split(String content) {
+        if (content.isBlank()) {
+            return List.of();
+        }
+
         var sentences = splitSentences(content, config.getSentenceSplittingRegex());
+
+        if (sentences.isEmpty()) {
+            return List.of();
+        }
 
         if (sentences.size() == 1) {
             var sentence = sentences.getFirst();
-            var chunk = Chunk.of(0, sentence.getContent());
-            return List.of(chunk);
+            return List.of(Chunk.of(0, sentence.getContent()));
         }
 
         sentences = combineSentences(sentences, config.getBufferSize());
@@ -71,8 +79,8 @@ public class SemanticChunker implements IChunker {
     /**
      * Splits the content into raw sentences using the given regex.
      *
-     * @param content the text to split
-     * @param regex the regex used for splitting
+     * @param content   the text to split
+     * @param regex     the regex used for splitting
      * @return a list of {@link Sentence} objects
      *
      * @implNote The regex is passed explicitly (instead of reading from {@link Config})
@@ -82,6 +90,8 @@ public class SemanticChunker implements IChunker {
     List<Sentence> splitSentences(final String content, final String regex) {
         var index = new AtomicInteger(0);
         return Arrays.stream(content.split(regex))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
                 .map(sentence -> Sentence.of(index.getAndIncrement(), sentence))
                 .toList();
     }
@@ -90,52 +100,36 @@ public class SemanticChunker implements IChunker {
      * Combines sentences into overlapping windows according to the given buffer size.
      * Each combined sentence includes the current sentence and its surrounding context.
      *
-     * @param sentences the list of sentences
-     * @param bufferSize the number of sentences before and after to include
+     * @param sentences     the list of sentences
+     * @param bufferSize    the number of sentences before and after to include
      * @return the list of sentences with combined context
      *
      * @implNote this method is implemented using the sliding window technique to reduce the time complexity
      */
     @VisibleForTesting
-    List<Sentence> combineSentences(List<Sentence> sentences, Integer bufferSize) {
+    List<Sentence> combineSentences(List<Sentence> sentences, int bufferSize) {
         Assertions.notNull(sentences, "The list of sentences cannot be null");
         Assertions.notEmpty(sentences, "The list of sentences cannot be empty");
 
-        Assertions.notNull(bufferSize, "The buffer size cannot be null");
         Assertions.isTrue(bufferSize > 0, "The buffer size must be greater than 0");
         Assertions.isTrue(bufferSize < sentences.size(), "The buffer size must be smaller than the sentences size");
 
-        var n = sentences.size();
-        var windowSize = bufferSize * 2 + 1;
-        var currentWindowSize = 0;
-        var windowBuilder = new StringBuilder();
+        final var n = sentences.size();
+        final var size = Math.min(bufferSize, n - 1);
+        final var window = new ArrayDeque<String>(size);
 
-        for (int i = 0; i <= Math.min(bufferSize, n - 1); i++) {
-            windowBuilder.append(sentences.get(i).getContent()).append(" ");
-            currentWindowSize++;
+        for (int i = 0; i <= size; ++i) {
+            window.addLast(sentences.get(i).getContent());
         }
 
-        windowBuilder.deleteCharAt(windowBuilder.length() - 1);
-
         for (int i = 0; i < n; ++i) {
-            sentences.get(i).setCombined(windowBuilder.toString());
+            sentences.get(i).setCombined(String.join(" ", window));
 
-            if (currentWindowSize < windowSize && i + bufferSize + 1 < n) {
-                windowBuilder
-                        .append(" ")
-                        .append(sentences.get(i + bufferSize + 1).getContent());
-                currentWindowSize++;
-            } else {
-                windowBuilder.delete(
-                        0, sentences.get(i - bufferSize).getContent().length() + 1);
-                if (i + bufferSize + 1 < n) {
-                    windowBuilder
-                            .append(" ")
-                            .append(sentences.get(i + bufferSize + 1).getContent());
-                } else {
-                    currentWindowSize--;
-                }
-            }
+            var nextRight = i + bufferSize + 1;
+            var nextLeft = i - bufferSize + 1;
+
+            if (nextRight < n) window.addLast(sentences.get(nextRight).getContent());
+            if (nextLeft > 0) window.removeFirst();
         }
 
         return sentences;
@@ -144,14 +138,14 @@ public class SemanticChunker implements IChunker {
     /**
      * Generates embeddings for the given sentences using the configured {@link Embedder}.
      *
-     * @param embedder the embedding provider
+     * @param embedder  the embedding provider
      * @param sentences the list of sentences
      * @return the sentences enriched with embeddings
      */
     @VisibleForTesting
     List<Sentence> embedSentences(final Embedder embedder, final List<Sentence> sentences) {
-        var sentencesText = sentences.stream().map(Sentence::getContent).toList();
-        var embeddings = embedder.embed(sentencesText);
+        var contents = sentences.stream().map(Sentence::getCombined).toList();
+        var embeddings = embedder.embed(contents);
 
         return IntStream.range(0, sentences.size())
                 .mapToObj(i -> {
@@ -166,18 +160,18 @@ public class SemanticChunker implements IChunker {
      * Computes pairwise similarities between consecutive sentences.
      *
      * @param sentences the list of sentences with embeddings
-     * @return a list of similarity scores
+     * @return an array of similarity scores
      */
     @VisibleForTesting
-    List<Double> calculateSimilarities(final List<Sentence> sentences) {
+    double[] calculateSimilarities(final List<Sentence> sentences) {
         return IntStream.range(0, sentences.size() - 1)
                 .parallel()
-                .mapToObj(i -> {
+                .mapToDouble(i -> {
                     Sentence sentence1 = sentences.get(i);
                     Sentence sentence2 = sentences.get(i + 1);
                     return cosineSimilarity(sentence1.getEmbedding(), sentence2.getEmbedding());
                 })
-                .toList();
+                .toArray();
     }
 
     /**
@@ -209,43 +203,42 @@ public class SemanticChunker implements IChunker {
      * Determines break points where new chunks should begin, based on the given percentile
      * threshold applied to similarity scores.
      *
-     * @param distances list of cosine similarities between consecutive sentences
-     * @param percentile the percentile threshold (e.g. 95)
-     * @return the list of indices representing break points
+     * @param distances     list of cosine similarities between consecutive sentences
+     * @param percentile    the percentile threshold (e.g. 95)
+     * @return array of indices representing break points
      */
     @VisibleForTesting
-    List<Integer> calculateBreakPoints(final List<Double> distances, final int percentile) {
+    int[] calculateBreakPoints(final double[] distances, final int percentile) {
         Assertions.notNull(distances, "The list of distances cannot be null");
-        Assertions.notEmpty(distances, "The list of distances cannot be empty");
+        Assertions.isTrue(distances.length > 0, "The list of distances cannot be empty");
 
         var breakpointDistanceThreshold = calculatePercentile(distances, percentile);
 
-        return IntStream.range(0, distances.size())
-                .filter(i -> distances.get(i) >= breakpointDistanceThreshold)
-                .boxed()
-                .toList();
+        return IntStream.range(0, distances.length)
+                .filter(i -> distances[i] >= breakpointDistanceThreshold)
+                .toArray();
     }
 
     /**
      * Generates the final chunks by grouping sentences according to the break points.
      *
-     * @param sentences the list of sentences
-     * @param breakPoints the indices where splits should occur
+     * @param sentences     the list of sentences
+     * @param breakPoints   the indices where splits should occur
      * @return the final list of semantic chunks
      */
     @VisibleForTesting
-    List<Chunk> generateChunks(final List<Sentence> sentences, final List<Integer> breakPoints) {
+    List<Chunk> generateChunks(final List<Sentence> sentences, final int[] breakPoints) {
         Assertions.notNull(sentences, "The list of sentences cannot be null");
         Assertions.notEmpty(sentences, "The list of sentences cannot be empty");
         Assertions.notNull(breakPoints, "The list of break points cannot be null");
 
         var index = new AtomicInteger(0);
 
-        return IntStream.range(0, breakPoints.size() + 1)
+        return IntStream.range(0, breakPoints.length + 1)
                 .mapToObj(i -> {
-                    int start = i == 0 ? 0 : breakPoints.get(i - 1) + 1;
-                    int end = i == breakPoints.size() ? sentences.size() : breakPoints.get(i) + 1;
-                    String content = sentences.subList(start, end).stream()
+                    var start = i == 0 ? 0 : breakPoints[i - 1] + 1;
+                    var end = i == breakPoints.length ? sentences.size() : breakPoints[i] + 1;
+                    var content = sentences.subList(start, end).stream()
                             .map(Sentence::getContent)
                             .collect(Collectors.joining(" "));
                     return new Chunk(index.getAndIncrement(), content);
@@ -253,12 +246,16 @@ public class SemanticChunker implements IChunker {
                 .toList();
     }
 
-    private double calculatePercentile(final List<Double> distances, final int percentile) {
+    private double calculatePercentile(final double[] distances, final int percentile) {
         Assertions.notNull(distances, "The list of distances cannot be null");
+        Assertions.isTrue(percentile > 0 && percentile < 100, "The percentile must be between 1 and 99");
+        Assertions.isTrue(distances.length > 0, "The list of distances cannot be empty");
 
-        var sortedDistances = distances.stream().sorted().toList();
+        var copy = distances.clone();
+        Arrays.parallelSort(copy);
 
-        var rank = (int) Math.ceil(percentile / 100.0 * distances.size());
-        return sortedDistances.get(rank - 1);
+        var n = distances.length;
+        var rank = (int) Math.ceil(percentile / 100.0 * n);
+        return copy[rank - 1];
     }
 }
