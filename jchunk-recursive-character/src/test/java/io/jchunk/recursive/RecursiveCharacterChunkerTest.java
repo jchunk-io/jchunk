@@ -2,7 +2,7 @@ package io.jchunk.recursive;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.jchunk.commons.Delimiter;
+import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import java.util.List;
 import java.util.stream.Stream;
@@ -151,24 +151,6 @@ class RecursiveCharacterChunkerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideAllSplitCases")
-    void test_split_with_delimiter(String content, String delimiter, Delimiter policy, List<String> expectedChunks) {
-        // given
-        var config = Config.builder()
-                .delimiters(List.of(delimiter))
-                .keepDelimiter(policy)
-                .build();
-
-        var chunker = new RecursiveCharacterChunker(config);
-
-        // when
-        var chunks = chunker.splitWithDelimiter(content, delimiter);
-
-        // then
-        assertThat(chunks).isEqualTo(expectedChunks);
-    }
-
-    @ParameterizedTest
     @MethodSource("provideSplitWithOverlapScenarios")
     void test_split_with_overlap(Delimiter keepDelimiter, List<String> expectedContent) {
         // given
@@ -192,32 +174,6 @@ class RecursiveCharacterChunkerTest {
     private static Stream<Arguments> provideEmptyAndNullCases() {
         return Stream.of(Arguments.of("", 0), Arguments.of(null, 0), Arguments.of("   ", 0));
     }
-
-    // @formatter:off
-
-    private static Stream<Arguments> provideAllSplitCases() {
-        return Stream.of(
-                // --- START POLICY ---
-                Arguments.of("A!!B", "!", Delimiter.START, List.of("A", "!", "!B")),
-                Arguments.of("!A!B", "!", Delimiter.START, List.of("!A", "!B")),
-                Arguments.of("A!B", "!", Delimiter.START, List.of("A", "!B")),
-
-                // --- END POLICY ---
-                Arguments.of("A..B", "\\.", Delimiter.END, List.of("A.", ".", "B")),
-                Arguments.of("A.B.", "\\.", Delimiter.END, List.of("A.", "B.")),
-                Arguments.of(".A", "\\.", Delimiter.END, List.of(".", "A")),
-
-                // --- NONE POLICY ---
-                Arguments.of("A!B!C", "!", Delimiter.NONE, List.of("A", "B", "C")),
-                Arguments.of("!!!", "!", Delimiter.NONE, List.of()),
-
-                // --- EDGE CASES ---
-                Arguments.of("ABC", "", Delimiter.NONE, List.of("A", "B", "C")),
-                Arguments.of("   ", "!", Delimiter.START, List.of()),
-                Arguments.of("A", "!", Delimiter.START, List.of("A")));
-    }
-
-    // @formatter:on
 
     private static Stream<Arguments> provideSplitWithOverlapScenarios() {
         return Stream.of(
