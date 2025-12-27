@@ -46,6 +46,7 @@
             <groupId>io.jchunk</groupId>
             <artifactId>commons</artifactId>
             <version>0.0.5-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.jchunk</groupId>

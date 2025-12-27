@@ -1,4 +1,4 @@
-package io.jchunk.commons;
+package io.jchunk.core;
 
 /**
  * Enum to represent the delimiter configuration:

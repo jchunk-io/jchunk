@@ -1,7 +1,7 @@
 package io.jchunk.fixed;
 
 import io.jchunk.assertions.Assertions;
-import io.jchunk.commons.Delimiter;
+import io.jchunk.core.Delimiter;
 
 /**
  * Configuration for a fixed-size, delimiter-aware chunker.

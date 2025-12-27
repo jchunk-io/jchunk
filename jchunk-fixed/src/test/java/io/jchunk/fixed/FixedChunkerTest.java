@@ -2,9 +2,8 @@ package io.jchunk.fixed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.jchunk.commons.Delimiter;
+import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
-import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -17,62 +16,61 @@ class FixedChunkerTest {
     private static final String CONTENT =
             "This is the text I would like to chunk up. It is the example text for this exercise";
 
-    // @formatter:off
-
     @Test
     void test_split_with_default_config() {
         // given
         chunker = new FixedChunker();
-        List<Chunk> expectedChunks = List.of(
-                Chunk.of(0, "This is the text I would like to chunk up. It is the example text for this exercise"));
 
         // when
-        List<Chunk> chunks = chunker.split(CONTENT);
+        var chunks = chunker.split(CONTENT);
 
         // then
-        assertThat(chunks).isNotNull().hasSize(1).containsExactlyElementsOf(expectedChunks);
+        assertThat(chunks)
+                .isNotNull()
+                .containsExactly(Chunk.of(
+                        0, "This is the text I would like to chunk up. It is the example text for this exercise"));
     }
 
     @Test
     void test_split_with_custom_delimiter() {
         // given
-        Config config =
+        var config =
                 Config.builder().chunkSize(20).chunkOverlap(0).delimiter("\\.").build();
         chunker = new FixedChunker(config);
 
-        List<Chunk> expectedChunks =
-                List.of(Chunk.of(0, "This is an example"), Chunk.of(1, "Let's split on periods"), Chunk.of(2, "Okay?"));
-
         // when
-        List<Chunk> chunks = chunker.split("This is an example. Let's split on periods. Okay?");
+        var chunks = chunker.split("This is an example. Let's split on periods. Okay?");
 
         // then
-        assertThat(chunks).isNotNull().hasSize(3).containsExactlyElementsOf(expectedChunks);
+        assertThat(chunks)
+                .isNotNull()
+                .containsExactly(
+                        Chunk.of(0, "This is an example"), Chunk.of(1, "Let's split on periods"), Chunk.of(2, "Okay?"));
     }
 
     @Test
     void test_split_with_custom_config() {
         // given
-        Config config =
+        var config =
                 Config.builder().chunkSize(35).chunkOverlap(4).delimiter("").build();
         chunker = new FixedChunker(config);
 
-        List<Chunk> expectedChunks = List.of(
-                Chunk.of(0, "This is the text I would like to ch"),
-                Chunk.of(1, "o chunk up. It is the example text"),
-                Chunk.of(2, "ext for this exercise"));
-
         // when
-        List<Chunk> chunks = chunker.split(CONTENT);
+        var chunks = chunker.split(CONTENT);
 
         // then
-        assertThat(chunks).isNotNull().hasSize(3).containsExactlyElementsOf(expectedChunks);
+        assertThat(chunks)
+                .isNotNull()
+                .containsExactly(
+                        Chunk.of(0, "This is the text I would like to ch"),
+                        Chunk.of(1, "o chunk up. It is the example text"),
+                        Chunk.of(2, "ext for this exercise"));
     }
 
     @Test
     void test_split_with_custom_config_no_white_space() {
         // given
-        Config config = Config.builder()
+        var config = Config.builder()
                 .chunkSize(35)
                 .chunkOverlap(0)
                 .delimiter("")
@@ -80,22 +78,22 @@ class FixedChunkerTest {
                 .build();
         chunker = new FixedChunker(config);
 
-        List<Chunk> expectedChunks = List.of(
-                Chunk.of(0, "This is the text I would like to ch"),
-                Chunk.of(1, "unk up. It is the example text for "),
-                Chunk.of(2, "this exercise"));
-
         // when
-        List<Chunk> chunks = chunker.split(CONTENT);
+        var chunks = chunker.split(CONTENT);
 
         // then
-        assertThat(chunks).isNotNull().hasSize(3).containsExactlyElementsOf(expectedChunks);
+        assertThat(chunks)
+                .isNotNull()
+                .containsExactly(
+                        Chunk.of(0, "This is the text I would like to ch"),
+                        Chunk.of(1, "unk up. It is the example text for "),
+                        Chunk.of(2, "this exercise"));
     }
 
     @Test
     void test_split_with_custom_config_with_keep_delimiter_none() {
         // given
-        Config config = Config.builder()
+        var config = Config.builder()
                 .chunkSize(35)
                 .chunkOverlap(0)
                 .delimiter("ch")
@@ -104,81 +102,82 @@ class FixedChunkerTest {
                 .build();
         chunker = new FixedChunker(config);
 
-        List<Chunk> expectedChunks = List.of(
-                Chunk.of(0, "This is the text I would like to"),
-                Chunk.of(1, "unk up. It is the example text for this exercise"));
-
         // when
-        List<Chunk> chunks = chunker.split(CONTENT);
+        var chunks = chunker.split(CONTENT);
 
         // then
-        assertThat(chunks).isNotNull().hasSize(2).containsExactlyElementsOf(expectedChunks);
+        assertThat(chunks)
+                .isNotNull()
+                .containsExactly(
+                        Chunk.of(0, "This is the text I would like to"),
+                        Chunk.of(1, "unk up. It is the example text for this exercise"));
     }
 
     @Test
     void test_split_into_sentences_with_blank_separator() {
         // given
-        chunker = new FixedChunker();
-        Config config = Config.builder().delimiter("").build();
+        var config = Config.builder().delimiter("").build();
+        chunker = new FixedChunker(config);
 
         // when
-        List<String> sentences = chunker.splitIntoSentences(CONTENT, config);
+        var sentences = chunker.splitIntoSentences(CONTENT, config);
 
         // then
-        assertThat(sentences).isNotNull().hasSize(CONTENT.length());
-
-        for (int i = 0; i < CONTENT.length(); i++) {
-            assertThat(sentences.get(i)).isEqualTo(String.valueOf(CONTENT.charAt(i)));
-        }
+        assertThat(sentences)
+                .isNotNull()
+                .containsExactlyElementsOf(
+                        CONTENT.chars().mapToObj(c -> String.valueOf((char) c)).toList());
     }
 
     @Test
     void test_split_into_sentences_with_no_delimiter() {
         // given
-        chunker = new FixedChunker();
-        Config config = Config.builder().delimiter("ch").build();
+        var config = Config.builder().delimiter("ch").build();
+        chunker = new FixedChunker(config);
 
         // when
-        List<String> sentences = chunker.splitIntoSentences(CONTENT, config);
+        var sentences = chunker.splitIntoSentences(CONTENT, config);
 
         // then
-        assertThat(sentences).isNotNull().hasSize(2);
-        assertThat(sentences.getFirst()).isEqualTo("This is the text I would like to ");
-        assertThat(sentences.getLast()).isEqualTo("unk up. It is the example text for this exercise");
+        assertThat(sentences)
+                .isNotNull()
+                .containsExactly(
+                        "This is the text I would like to ", "unk up. It is the example text for this exercise");
     }
 
     @Test
     void test_split_into_sentences_with_delimiter_start() {
         // given
-        chunker = new FixedChunker();
-        Config config =
+        var config =
                 Config.builder().delimiter("ch").keepDelimiter(Delimiter.START).build();
+        chunker = new FixedChunker(config);
 
         // when
-        List<String> sentences = chunker.splitIntoSentences(CONTENT, config);
+        var sentences = chunker.splitIntoSentences(CONTENT, config);
 
         // then
-        assertThat(sentences).isNotNull().hasSize(2);
-        assertThat(sentences.getFirst()).isEqualTo("This is the text I would like to ");
-        assertThat(sentences.getLast()).isEqualTo("chunk up. It is the example text for this exercise");
+        assertThat(sentences)
+                .isNotNull()
+                .hasSize(2)
+                .containsExactly(
+                        "This is the text I would like to ", "chunk up. It is the example text for this exercise");
     }
 
     @Test
     void test_split_into_sentences_with_delimiter_end() {
         // given
-        chunker = new FixedChunker();
-        Config config =
+        var config =
                 Config.builder().delimiter("ch").keepDelimiter(Delimiter.END).build();
+        chunker = new FixedChunker(config);
 
         // when
-        List<String> sentences = chunker.splitIntoSentences(CONTENT, config);
+        var sentences = chunker.splitIntoSentences(CONTENT, config);
 
         // then
-        assertThat(sentences).isNotNull().hasSize(2);
-        assertThat(sentences.getFirst()).isEqualTo("This is the text I would like to ch");
-        assertThat(sentences.getLast()).isEqualTo("unk up. It is the example text for this exercise");
+        assertThat(sentences)
+                .isNotNull()
+                .hasSize(2)
+                .containsExactly(
+                        "This is the text I would like to ch", "unk up. It is the example text for this exercise");
     }
-
-    // @formatter:on
-
 }

@@ -3,7 +3,7 @@ package io.jchunk.recursive;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.jchunk.commons.Delimiter;
+import io.jchunk.core.Delimiter;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayNameGeneration;
