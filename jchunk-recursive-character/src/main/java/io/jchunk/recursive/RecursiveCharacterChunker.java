@@ -1,12 +1,14 @@
 package io.jchunk.recursive;
 
-import io.jchunk.commons.Delimiter;
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
+
+import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
-import io.jchunk.core.decorators.VisibleForTesting;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 /**
  * Recursive, delimiter-aware chunker.
@@ -60,10 +62,23 @@ public class RecursiveCharacterChunker implements IChunker {
     private final Config config;
     private final Map<String, Pattern> compiledPatterns;
 
+    /**
+     * Constructs a new instance of {@code RecursiveCharacterChunker} with the default configuration.
+     * Internally, it delegates to the main constructor, initializing the object with the default
+     * {@link Config} instance.
+     */
     public RecursiveCharacterChunker() {
         this(Config.defaultConfig());
     }
 
+    /**
+     * Constructs a new instance of {@code RecursiveCharacterChunker} with the specified configuration.
+     * Initializes the internal map of compiled patterns for each non-empty delimiter specified
+     * in the provided {@link Config}.
+     *
+     * @param config the configuration defining splitting rules, including delimiters, chunk size,
+     *               overlap parameters, and trimming policies
+     */
     public RecursiveCharacterChunker(Config config) {
         this.config = config;
         this.compiledPatterns = new HashMap<>();
@@ -89,7 +104,11 @@ public class RecursiveCharacterChunker implements IChunker {
         if (content == null || content.isBlank()) {
             return Collections.emptyList();
         }
-        return splitContent(content, config.getDelimiters(), new AtomicInteger(0));
+
+        var sentences = splitContent(content, config.getDelimiters());
+        return IntStream.range(0, sentences.size())
+                .mapToObj(i -> Chunk.of(i, sentences.get(i)))
+                .toList();
     }
 
     /**
@@ -98,36 +117,37 @@ public class RecursiveCharacterChunker implements IChunker {
      *
      * @param content     the text to split
      * @param delimiters  remaining delimiters (will be consumed as recursion proceeds)
-     * @param index       running chunk index (shared across recursion)
      * @return list of generated chunks
      */
     @SuppressWarnings("java:S3776")
-    private List<Chunk> splitContent(String content, List<String> delimiters, AtomicInteger index) {
+    private List<String> splitContent(String content, List<String> delimiters) {
         if (content.length() <= config.getChunkSize() || delimiters.isEmpty()) {
-            return List.of(createChunk(index, content));
+            return List.of(content);
         }
 
         var newDelimiters = new ArrayList<>(delimiters);
         var delimiter = getBestMatchingDelimiter(content, newDelimiters);
 
-        var splits = splitWithDelimiter(content, delimiter);
+        var splits = splitWithDelimiter(content, delimiter, config.getKeepDelimiter());
         var glue = (config.getKeepDelimiter() == Delimiter.NONE) ? delimiter : "";
 
-        final var chunks = new ArrayList<Chunk>(Math.max(4, splits.size()));
+        final var sentences = new ArrayList<String>(Math.max(4, splits.size()));
         final var bucket = new ArrayList<String>();
 
         for (String split : splits) {
             if (split.length() <= config.getChunkSize()) {
                 bucket.add(split);
             } else {
-                chunks.addAll(createChunksFromBucket(bucket, glue, index));
+                sentences.addAll(merge(
+                        bucket, glue, config.getChunkSize(), config.getChunkOverlap(), config.getTrimWhiteSpace()));
                 bucket.clear();
-                chunks.addAll(splitContent(split, newDelimiters, index));
+                sentences.addAll(splitContent(split, newDelimiters));
             }
         }
 
-        chunks.addAll(createChunksFromBucket(bucket, glue, index));
-        return chunks;
+        sentences.addAll(
+                merge(bucket, glue, config.getChunkSize(), config.getChunkOverlap(), config.getTrimWhiteSpace()));
+        return sentences;
     }
 
     /**
@@ -156,116 +176,5 @@ public class RecursiveCharacterChunker implements IChunker {
         }
 
         return "";
-    }
-
-    /**
-     * Creates a list of {@link Chunk} objects from the given bucket of strings by merging the
-     * fragments using the specified glue and assigning unique identifiers to each chunk.
-     *
-     * @param bucket    a list of strings to be merged into chunks
-     * @param glue      a string used to join the fragments in the bucket
-     * @param index     an {@link AtomicInteger} used to assign unique identifiers to each chunk
-     * @return a list of created {@link Chunk} objects or an empty list if the bucket is empty
-     */
-    private List<Chunk> createChunksFromBucket(List<String> bucket, String glue, AtomicInteger index) {
-        if (bucket.isEmpty()) return Collections.emptyList();
-        return mergeSentences(bucket, glue, index);
-    }
-
-    /**
-     * Splits the given content into a list of strings based on the specified delimiter. The behavior of
-     * the split operation depends on the configuration of delimiter retention. It supports character-level
-     * splitting if the delimiter is empty.
-     *
-     * @param content the input string to be split
-     * @param delimiter the delimiter string used to split the content; if empty, the content is split at the character level
-     * @return a list of non-blank substrings obtained after splitting
-     */
-    @VisibleForTesting
-    List<String> splitWithDelimiter(String content, String delimiter) {
-        if (delimiter.isEmpty()) {
-            return content.chars().mapToObj(c -> String.valueOf((char) c)).toList();
-        }
-
-        var regex =
-                switch (config.getKeepDelimiter()) {
-                    case START -> String.format("(?=%1$s)", delimiter);
-                    case END -> String.format("(?<=%1$s)", delimiter);
-                    case NONE -> delimiter;
-                };
-
-        return Arrays.stream(content.split(regex, -1)).filter(s -> !s.isBlank()).toList();
-    }
-
-    /**
-     * Merges a list of sentences into chunks of text while respecting a maximum chunk size
-     * and overlap constraints defined in the configuration. Chunks are created using the specified
-     * delimiter to join sentences, and each chunk is assigned a unique identifier.
-     *
-     * @param sentences a list of sentences to be merged into chunks
-     * @param delimiter the string used to join sentences within a chunk
-     * @param index     an {@link AtomicInteger} used to generate unique identifiers for each chunk
-     * @return a list of {@link Chunk} objects, where each represents a merged group of sentences
-     */
-    private List<Chunk> mergeSentences(List<String> sentences, String delimiter, AtomicInteger index) {
-        final var chunks = new ArrayList<Chunk>();
-        final var window = new ArrayDeque<String>();
-        var windowLen = 0;
-
-        for (String sentence : sentences) {
-            int addSize = sentence.length() + (window.isEmpty() ? 0 : delimiter.length());
-
-            if (!window.isEmpty() && windowLen + addSize > config.getChunkSize()) {
-                addChunk(chunks, window, delimiter, index);
-
-                while (windowLen > config.getChunkOverlap() && !window.isEmpty()) {
-                    var removed = window.removeFirst();
-                    windowLen -= removed.length();
-                    if (!window.isEmpty()) {
-                        windowLen -= delimiter.length();
-                    }
-                }
-            }
-
-            window.addLast(sentence);
-            windowLen += (window.size() == 1 ? sentence.length() : delimiter.length() + sentence.length());
-        }
-
-        if (!window.isEmpty()) {
-            addChunk(chunks, window, delimiter, index);
-        }
-
-        return chunks;
-    }
-
-    /**
-     * Combines the elements of the current chunk into a single string using the specified delimiter
-     * and adds the resulting {@link Chunk} to the collection of chunks.
-     *
-     * @param chunks        the collection of {@link Chunk} objects to which the new chunk will be added
-     * @param currentChunk  a deque of strings representing the current chunk to be processed
-     * @param delimiter     the delimiter used to join the elements of the current chunk
-     * @param index         an {@link AtomicInteger} used to generate a unique identifier for each chunk
-     */
-    private void addChunk(List<Chunk> chunks, Deque<String> currentChunk, String delimiter, AtomicInteger index) {
-        var sb = new StringBuilder();
-        for (String s : currentChunk) {
-            if (!sb.isEmpty()) sb.append(delimiter);
-            sb.append(s);
-        }
-
-        chunks.add(createChunk(index, sb.toString()));
-    }
-
-    /**
-     * Creates a new {@link Chunk} object with a unique identifier and content.
-     * The content is optionally trimmed based on the configuration.
-     *
-     * @param index   an {@link AtomicInteger} used to generate a unique identifier for the chunk
-     * @param content the content to be stored in the chunk
-     * @return a new {@link Chunk} with a unique identifier and processed content
-     */
-    private Chunk createChunk(AtomicInteger index, String content) {
-        return Chunk.of(index.getAndIncrement(), config.getTrimWhiteSpace() ? content.trim() : content);
     }
 }
