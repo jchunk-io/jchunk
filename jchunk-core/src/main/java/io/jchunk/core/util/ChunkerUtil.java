@@ -1,7 +1,13 @@
 package io.jchunk.core.util;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+
 import io.jchunk.core.Delimiter;
-import java.util.*;
 
 /**
  * Utility class for operations related to splitting and merging text content into chunks.

@@ -1,14 +1,20 @@
 package io.jchunk.recursive;
 
-import static io.jchunk.core.util.ChunkerUtil.merge;
-import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
+
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
 
 /**
  * Recursive, delimiter-aware chunker.

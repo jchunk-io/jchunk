@@ -1,18 +1,20 @@
 package io.jchunk.core.util;
 
-import static io.jchunk.core.util.ChunkerUtil.merge;
-import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.jchunk.core.Delimiter;
 import java.util.List;
 import java.util.stream.Stream;
+
+import io.jchunk.core.Delimiter;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ChunkerUtilTest {
