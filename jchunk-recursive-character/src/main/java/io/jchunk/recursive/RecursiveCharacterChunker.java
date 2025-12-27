@@ -110,11 +110,6 @@ public class RecursiveCharacterChunker implements IChunker {
         var newDelimiters = new ArrayList<>(delimiters);
         var delimiter = getBestMatchingDelimiter(content, newDelimiters);
 
-        if (delimiter.isEmpty() && newDelimiters.equals(delimiters)) {
-            var chunkContent = config.getTrimWhiteSpace() ? content.trim() : content;
-            return List.of(Chunk.of(index.getAndIncrement(), chunkContent));
-        }
-
         var splits = splitWithDelimiter(content, delimiter);
         var glue = (config.getKeepDelimiter() == Delimiter.NONE) ? delimiter : "";
 
