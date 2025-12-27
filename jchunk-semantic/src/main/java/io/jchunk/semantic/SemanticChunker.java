@@ -1,16 +1,17 @@
 package io.jchunk.semantic;
 
-import io.jchunk.assertions.Assertions;
-import io.jchunk.core.chunk.Chunk;
-import io.jchunk.core.chunk.IChunker;
-import io.jchunk.core.decorators.VisibleForTesting;
-import io.jchunk.semantic.embedder.Embedder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import io.jchunk.assertions.Assertions;
+import io.jchunk.commons.annotations.VisibleForTesting;
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.core.chunk.IChunker;
+import io.jchunk.semantic.embedder.Embedder;
 
 /**
  * A semantic chunker that splits input text into a list of {@link Chunk}
@@ -37,24 +38,39 @@ public class SemanticChunker implements IChunker {
 
     private final Config config;
 
+    /**
+     * Constructs a new instance of the SemanticChunker class using the provided embedder
+     * and a default configuration.
+     *
+     * @param embedder an instance of Embedder used to generate embeddings for text processing
+     */
     public SemanticChunker(final Embedder embedder) {
         this(embedder, Config.defaultConfig());
     }
 
+    /**
+     * Constructs a new instance of the SemanticChunker class.
+     *
+     * @param embedder an instance of Embedder used to generate embeddings for text processing
+     * @param config   a configuration object that defines various parameters for the chunking process
+     */
     public SemanticChunker(final Embedder embedder, final Config config) {
         this.embedder = embedder;
         this.config = config;
     }
 
     /**
-     * Splits the given text into semantic chunks.
+     * Splits the provided content into semantic chunks by processing the text through
+     * sentence segmentation, embedding, and similarity-based chunking strategies.
      *
-     * @param content   the raw text to split
-     * @return a list of semantic chunks
+     * @param content the textual data to be split into semantic chunks. If null or blank,
+     *                an empty list will be returned.
+     * @return a list of {@code Chunk} objects, where each represents a segment of semantically
+     *         grouped content. Returns an empty list if the input content has no valid sentences.
      */
     @Override
     public List<Chunk> split(String content) {
-        if (content.isBlank()) {
+        if (content == null || content.isBlank()) {
             return List.of();
         }
 
@@ -175,7 +191,7 @@ public class SemanticChunker implements IChunker {
     }
 
     /**
-     * Calculate the similarity between the sentences embeddings
+     * Calculate the similarity between the sentence embeddings
      *
      * @param sentence1 the first sentence embedding
      * @param sentence2 the second sentence embedding

@@ -1,13 +1,20 @@
 package io.jchunk.recursive;
 
-import io.jchunk.commons.Delimiter;
-import io.jchunk.core.chunk.Chunk;
-import io.jchunk.core.chunk.IChunker;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+
+import io.jchunk.core.Delimiter;
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.core.chunk.IChunker;
+
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
 
 /**
  * Recursive, delimiter-aware chunker.
@@ -58,30 +65,56 @@ import java.util.stream.IntStream;
  */
 public class RecursiveCharacterChunker implements IChunker {
 
-    private static final Logger logger = Logger.getLogger(RecursiveCharacterChunker.class.getName());
-
-    private static final String LONGER_THAN_THE_SPECIFIED =
-            "Created a chunk of size %d, which is longer than the specified %d";
-
     private final Config config;
+    private final Map<String, Pattern> compiledPatterns;
 
+    /**
+     * Constructs a new instance of {@code RecursiveCharacterChunker} with the default configuration.
+     * Internally, it delegates to the main constructor, initializing the object with the default
+     * {@link Config} instance.
+     */
     public RecursiveCharacterChunker() {
         this(Config.defaultConfig());
     }
 
+    /**
+     * Constructs a new instance of {@code RecursiveCharacterChunker} with the specified configuration.
+     * Initializes the internal map of compiled patterns for each non-empty delimiter specified
+     * in the provided {@link Config}.
+     *
+     * @param config the configuration defining splitting rules, including delimiters, chunk size,
+     *               overlap parameters, and trimming policies
+     */
     public RecursiveCharacterChunker(Config config) {
         this.config = config;
+        this.compiledPatterns = new HashMap<>();
+
+        for (String delimiter : config.getDelimiters()) {
+            if (!delimiter.isEmpty()) {
+                this.compiledPatterns.put(delimiter, Pattern.compile(delimiter));
+            }
+        }
     }
 
     /**
-     * Splits the provided content according to the configured delimiters and size/overlap policy.
+     * Splits the given content into smaller chunks based on the configuration's delimiters.
+     * If the content is null or blank, it returns an empty list. Otherwise, it delegates
+     * the splitting process to {@code splitContent}.
      *
-     * @param content input text to split
-     * @return ordered list of {@link Chunk}
+     * @param content the input string to be split into chunks
+     * @return a list of {@link Chunk} objects representing the split content;
+     *         or an empty list if the content is null or blank
      */
     @Override
     public List<Chunk> split(String content) {
-        return splitContent(content, config.getDelimiters(), new AtomicInteger(0));
+        if (content == null || content.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        var sentences = splitContent(content, config.getDelimiters());
+        return IntStream.range(0, sentences.size())
+                .mapToObj(i -> Chunk.of(i, sentences.get(i)))
+                .toList();
     }
 
     /**
@@ -90,48 +123,37 @@ public class RecursiveCharacterChunker implements IChunker {
      *
      * @param content     the text to split
      * @param delimiters  remaining delimiters (will be consumed as recursion proceeds)
-     * @param index       running chunk index (shared across recursion)
      * @return list of generated chunks
      */
     @SuppressWarnings("java:S3776")
-    private List<Chunk> splitContent(String content, List<String> delimiters, AtomicInteger index) {
+    private List<String> splitContent(String content, List<String> delimiters) {
+        if (content.length() <= config.getChunkSize() || delimiters.isEmpty()) {
+            return List.of(content);
+        }
+
         var newDelimiters = new ArrayList<>(delimiters);
         var delimiter = getBestMatchingDelimiter(content, newDelimiters);
 
-        var splits = splitWithDelimiter(content, delimiter);
+        var splits = splitWithDelimiter(content, delimiter, config.getKeepDelimiter());
+        var glue = (config.getKeepDelimiter() == Delimiter.NONE) ? delimiter : "";
 
-        var goodSplits = new ArrayList<String>();
-        var delimiterToUse = config.getKeepDelimiter() != Delimiter.NONE ? "" : delimiter;
-
-        var chunks = new ArrayList<Chunk>();
+        final var sentences = new ArrayList<String>(Math.max(4, splits.size()));
+        final var bucket = new ArrayList<String>();
 
         for (String split : splits) {
-            if (split.length() < config.getChunkSize()) {
-                goodSplits.add(split);
+            if (split.length() <= config.getChunkSize()) {
+                bucket.add(split);
             } else {
-                if (!goodSplits.isEmpty()) {
-                    var generatedChunks = mergeSentences(goodSplits, delimiterToUse, index);
-                    chunks.addAll(generatedChunks);
-                    goodSplits.clear();
-                }
-
-                if (newDelimiters.isEmpty()) {
-                    var chunkContent = config.getTrimWhiteSpace() ? split.trim() : split;
-                    Chunk chunk = Chunk.of(index.getAndIncrement(), chunkContent);
-                    chunks.add(chunk);
-                } else {
-                    List<Chunk> generatedChunks = splitContent(split, newDelimiters, index);
-                    chunks.addAll(generatedChunks);
-                }
+                sentences.addAll(merge(
+                        bucket, glue, config.getChunkSize(), config.getChunkOverlap(), config.getTrimWhiteSpace()));
+                bucket.clear();
+                sentences.addAll(splitContent(split, newDelimiters));
             }
         }
 
-        if (!goodSplits.isEmpty()) {
-            List<Chunk> generatedChunks = mergeSentences(goodSplits, delimiterToUse, index);
-            chunks.addAll(generatedChunks);
-        }
-
-        return chunks;
+        sentences.addAll(
+                merge(bucket, glue, config.getChunkSize(), config.getChunkOverlap(), config.getTrimWhiteSpace()));
+        return sentences;
     }
 
     /**
@@ -152,163 +174,13 @@ public class RecursiveCharacterChunker implements IChunker {
                 return delimiter;
             }
 
-            if (Pattern.compile(delimiter).matcher(content).find()) {
+            var pattern = compiledPatterns.get(delimiter);
+            if (pattern.matcher(content).find()) {
                 iterator.remove();
                 return delimiter;
             }
         }
 
         return "";
-    }
-
-    /**
-     * Splits {@code content} by {@code delimiter}, applying the configured delimiter-retention policy
-     * ({@link Delimiter#START}, {@link Delimiter#END}, or {@link Delimiter#NONE}).
-     *
-     * @param content   the text to split
-     * @param delimiter the delimiter regex for content splitting
-     * @return split fragments
-     */
-    private List<String> splitWithDelimiter(String content, String delimiter) {
-        if (delimiter.isEmpty()) {
-            return content.chars().mapToObj(c -> String.valueOf((char) c)).toList();
-        }
-
-        if (config.getKeepDelimiter() == Delimiter.NONE) {
-            return Arrays.stream(content.split(delimiter))
-                    .filter(s -> !s.isEmpty())
-                    .toList();
-        }
-
-        String withDelimiter = "((?<=%1$s)|(?=%1$s))";
-        List<String> preSplits = new ArrayList<>(List.of(content.split(String.format(withDelimiter, delimiter))));
-
-        return config.getKeepDelimiter() == Delimiter.START
-                ? splitWithDelimiterStart(preSplits)
-                : splitWithDelimiterEnd(preSplits);
-    }
-
-    /**
-     * Splits the content into sentences using the delimiter at the start of each sentence. {@link
-     * Delimiter#START}
-     *
-     * @param preSplits pre-splits by the delimiter
-     * @return the list of split sentences
-     */
-    private List<String> splitWithDelimiterStart(List<String> preSplits) {
-        var splits = new ArrayList<String>();
-
-        splits.add(preSplits.getFirst());
-        IntStream.range(1, preSplits.size() - 1)
-                .filter(i -> i % 2 == 1)
-                .forEach(i -> splits.add(preSplits.get(i).concat(preSplits.get(i + 1))));
-
-        return splits.stream().filter(s -> !s.isBlank()).toList();
-    }
-
-    /**
-     * Splits the content into sentences using the delimiter at the end of each sentence. {@link
-     * Delimiter#END}
-     *
-     * @param preSplits the pre-splits by the delimiter
-     * @return the list of split sentences
-     */
-    private List<String> splitWithDelimiterEnd(List<String> preSplits) {
-        var splits = new ArrayList<String>();
-
-        IntStream.range(0, preSplits.size() - 1)
-                .filter(i -> i % 2 == 0)
-                .forEach(i -> splits.add(preSplits.get(i).concat(preSplits.get(i + 1))));
-        splits.add(preSplits.getLast());
-
-        return splits.stream().filter(s -> !s.isBlank()).toList();
-    }
-
-    /**
-     * Merges fragments into size-bounded chunks while maintaining the configured overlap.
-     * Emits a warning if a produced chunk exceeds {@code chunkSize}.
-     *
-     * @param sentences   candidate fragments to merge
-     * @param delimiter   glue used when joining fragments
-     * @param index       running chunk index
-     * @return generated chunks (ordered)
-     */
-    private List<Chunk> mergeSentences(List<String> sentences, String delimiter, AtomicInteger index) {
-
-        var currentLen = 0;
-        var delimiterLen = delimiter.length();
-        var chunks = new ArrayList<Chunk>();
-        var currentChunk = new LinkedList<String>();
-
-        for (String sentence : sentences) {
-            int sentenceLength = sentence.length();
-
-            if (currentLen + sentenceLength + (currentChunk.isEmpty() ? 0 : delimiterLen) > config.getChunkSize()) {
-
-                if (currentLen > config.getChunkSize()) {
-                    var msg = String.format(LONGER_THAN_THE_SPECIFIED, currentLen, config.getChunkSize());
-                    logger.warning(msg);
-                }
-
-                if (!currentChunk.isEmpty()) {
-                    addChunk(chunks, currentChunk, delimiter, index);
-                    currentLen = adjustCurrentChunkForOverlap(currentChunk, currentLen, delimiterLen);
-                }
-            }
-
-            currentChunk.addLast(sentence);
-            currentLen += sentenceLength + (currentChunk.size() > 1 ? delimiterLen : 0);
-        }
-
-        if (!currentChunk.isEmpty()) {
-            addChunk(chunks, currentChunk, delimiter, index);
-        }
-
-        return chunks;
-    }
-
-    /**
-     * Adds the chunk to the list of chunks.
-     *
-     * @param chunks        the list of chunks
-     * @param currentChunk  the current chunk
-     * @param delimiter     the delimiter
-     * @param index         the index of the chunk
-     */
-    private void addChunk(List<Chunk> chunks, Deque<String> currentChunk, String delimiter, AtomicInteger index) {
-        var generatedSentence = joinSentences(new ArrayList<>(currentChunk), delimiter);
-        var chunk = Chunk.of(index.getAndIncrement(), generatedSentence);
-        chunks.add(chunk);
-    }
-
-    /**
-     * Adjusts the current chunk for overlap.
-     *
-     * @param currentChunk  the current chunk
-     * @param currentLen    the current length of the chunk
-     * @param delimiterLen  the length of the delimiter
-     * @return the adjusted length of the chunk
-     */
-    private int adjustCurrentChunkForOverlap(Deque<String> currentChunk, int currentLen, int delimiterLen) {
-        while (currentLen > config.getChunkOverlap() && !currentChunk.isEmpty()) {
-            currentLen -= currentChunk.removeFirst().length() + (currentChunk.isEmpty() ? 0 : delimiterLen);
-        }
-        return currentLen;
-    }
-
-    /**
-     * Joins the sentences into a single sentence.
-     *
-     * @param sentences the sentences to join
-     * @param delimiter the delimiter to join the sentences
-     * @return the generated sentence
-     */
-    private String joinSentences(List<String> sentences, String delimiter) {
-        var generatedSentence = String.join(delimiter, sentences);
-        if (config.getTrimWhiteSpace()) {
-            generatedSentence = generatedSentence.trim();
-        }
-
-        return generatedSentence;
     }
 }

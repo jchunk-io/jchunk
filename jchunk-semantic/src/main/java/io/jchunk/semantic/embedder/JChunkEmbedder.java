@@ -1,18 +1,32 @@
 package io.jchunk.semantic.embedder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.nio.FloatBuffer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.onnxruntime.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.FloatBuffer;
-import java.util.*;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ai.onnxruntime.NodeInfo;
+import ai.onnxruntime.OnnxTensor;
+import ai.onnxruntime.OnnxValue;
+import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtSession;
+import ai.onnxruntime.TensorInfo;
 
 /**
  * Default {@link Embedder} implementation backed by a HuggingFace tokenizer
