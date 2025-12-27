@@ -54,7 +54,7 @@ public class SemanticChunker implements IChunker {
      */
     @Override
     public List<Chunk> split(String content) {
-        if (content.isBlank()) {
+        if (content == null || content.isBlank()) {
             return List.of();
         }
 
