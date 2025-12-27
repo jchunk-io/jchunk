@@ -1,7 +1,7 @@
 package io.jchunk.recursive;
 
 import io.jchunk.assertions.Assertions;
-import io.jchunk.commons.Delimiter;
+import io.jchunk.core.Delimiter;
 import java.util.ArrayList;
 import java.util.List;
 
