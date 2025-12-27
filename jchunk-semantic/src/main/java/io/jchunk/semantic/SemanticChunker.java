@@ -1,16 +1,17 @@
 package io.jchunk.semantic;
 
-import io.jchunk.assertions.Assertions;
-import io.jchunk.commons.annotations.VisibleForTesting;
-import io.jchunk.core.chunk.Chunk;
-import io.jchunk.core.chunk.IChunker;
-import io.jchunk.semantic.embedder.Embedder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import io.jchunk.assertions.Assertions;
+import io.jchunk.commons.annotations.VisibleForTesting;
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.core.chunk.IChunker;
+import io.jchunk.semantic.embedder.Embedder;
 
 /**
  * A semantic chunker that splits input text into a list of {@link Chunk}

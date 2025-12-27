@@ -1,17 +1,19 @@
 package io.jchunk.recursive;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
+import java.util.stream.Stream;
 
 import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
-import java.util.List;
-import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class RecursiveCharacterChunkerTest {

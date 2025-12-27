@@ -1,18 +1,21 @@
 package io.jchunk.semantic;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.nio.charset.StandardCharsets;
 
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.semantic.embedder.Embedder;
 import io.jchunk.semantic.embedder.JChunkEmbedder;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for the {@link SemanticChunker}.
