@@ -3,12 +3,12 @@ package io.jchunk.fixed;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
+
 import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
-
-import static io.jchunk.core.util.ChunkerUtil.merge;
-import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
 
 /**
  * {@code FixedChunker} implements {@link IChunker} by splitting text into
