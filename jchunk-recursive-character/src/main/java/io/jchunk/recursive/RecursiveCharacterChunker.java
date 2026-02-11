@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import static io.jchunk.core.util.ChunkerUtil.merge;
+import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
+
 import io.jchunk.core.Delimiter;
 import io.jchunk.core.chunk.Chunk;
 import io.jchunk.core.chunk.IChunker;
-
-import static io.jchunk.core.util.ChunkerUtil.merge;
-import static io.jchunk.core.util.ChunkerUtil.splitWithDelimiter;
 
 /**
  * Recursive, delimiter-aware chunker.
@@ -89,11 +89,9 @@ public class RecursiveCharacterChunker implements IChunker {
         this.config = config;
         this.compiledPatterns = new HashMap<>();
 
-        for (String delimiter : config.getDelimiters()) {
-            if (!delimiter.isEmpty()) {
-                this.compiledPatterns.put(delimiter, Pattern.compile(delimiter));
-            }
-        }
+        config.getDelimiters().stream()
+                .filter(delimiter -> !delimiter.isEmpty())
+                .forEach(delimiter -> this.compiledPatterns.put(delimiter, Pattern.compile(delimiter)));
     }
 
     /**

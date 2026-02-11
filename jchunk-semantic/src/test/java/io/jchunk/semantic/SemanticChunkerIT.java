@@ -5,10 +5,6 @@ import java.io.InputStream;
 
 import java.nio.charset.StandardCharsets;
 
-import io.jchunk.core.chunk.Chunk;
-import io.jchunk.semantic.embedder.Embedder;
-import io.jchunk.semantic.embedder.JChunkEmbedder;
-
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -16,6 +12,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.jchunk.core.chunk.Chunk;
+import io.jchunk.semantic.embedder.Embedder;
+import io.jchunk.semantic.embedder.JChunkEmbedder;
 
 /**
  * Integration tests for the {@link SemanticChunker}.
