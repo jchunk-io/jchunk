@@ -4,7 +4,7 @@
     
     <groupId>io.jchunk</groupId>
     <artifactId>jchunk</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.6</version>
     <packaging>pom</packaging>
     
     <name>JChunk</name>
@@ -39,7 +39,7 @@
     <scm>
         <connection>scm:git:https://github.com/jchunk-io/jchunk.git</connection>
         <developerConnection>scm:git:https://github.com/jchunk-io/jchunk.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.0.6</tag>
         <url>https://github.com/jchunk-io/jchunk</url>
     </scm>
     
@@ -130,8 +130,8 @@
                             <formatJavadoc>false</formatJavadoc>
                         </palantirJavaFormat>
                         
-                        <removeUnusedImports/>
-                        <forbidWildcardImports/>
+                        <removeUnusedImports />
+                        <forbidWildcardImports />
                         
                         <importOrder>
                             <order>java.util,java.io,java.nio,javax,org,com,ai,\#</order>
