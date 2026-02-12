@@ -33,6 +33,7 @@
         <module>jchunk-fixed</module>
         <module>jchunk-recursive-character</module>
         <module>jchunk-semantic</module>
+        <module>jchunk-all</module>
     </modules>
     
     <scm>
@@ -128,10 +129,10 @@
                             <style>PALANTIR</style>
                             <formatJavadoc>false</formatJavadoc>
                         </palantirJavaFormat>
-
+                        
                         <removeUnusedImports/>
                         <forbidWildcardImports/>
-
+                        
                         <importOrder>
                             <order>java.util,java.io,java.nio,javax,org,com,ai,\#</order>
                         </importOrder>

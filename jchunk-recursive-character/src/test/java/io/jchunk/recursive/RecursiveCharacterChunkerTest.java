@@ -3,9 +3,6 @@ package io.jchunk.recursive;
 import java.util.List;
 import java.util.stream.Stream;
 
-import io.jchunk.core.Delimiter;
-import io.jchunk.core.chunk.Chunk;
-
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -14,6 +11,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.jchunk.core.Delimiter;
+import io.jchunk.core.chunk.Chunk;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class RecursiveCharacterChunkerTest {
