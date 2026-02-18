@@ -37,7 +37,7 @@
     </scm>
     
     <properties>
-        <onnxruntime.version>1.22.0</onnxruntime.version>
+        <onnxruntime.version>1.24.1</onnxruntime.version>
         <djl.version>0.34.0</djl.version>
     </properties>
     
