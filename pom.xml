@@ -69,7 +69,7 @@
         <!-- plugin versions -->
         <spotless.version>3.2.1</spotless.version>
         <palantir-format.version>2.39.0</palantir-format.version>
-        <surefire.version>3.5.4</surefire.version>
+        <surefire.version>3.5.5</surefire.version>
         <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
