@@ -1,3 +1,5 @@
+This project is unmaintained, due to time JChunk is officially ended.
+
 # JChunk
 
 [![GitHub Actions Status](https://img.shields.io/github/actions/workflow/status/jchunk-io/jchunk/build.yml?branch=main&logo=GitHub&style=for-the-badge)](.)
